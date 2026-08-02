@@ -1,0 +1,121 @@
+// Acervo do Manto — loja de camisas (mercado brasileiro)
+// Moeda: BRL (todos os valores *Cents são em centavos de Real)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model StoreProduct {
+  id                String          @id @default(cuid())
+  slug              String          @unique
+  nameEn            String
+  nameNl            String
+  namePt            String
+  teamName          String
+  league            String
+  season            String
+  category          ProductCategory
+  priceCents        Int // centavos de BRL
+  comparePriceCents Int?
+  images            String[]
+  sizes             String[]
+  supplierRef       String
+  supplierCost      Int
+  featured          Boolean         @default(false)
+  tags              String[]
+  active            Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  orderItems OrderItem[]
+
+  @@index([category])
+  @@index([teamName])
+  @@index([featured])
+  @@index([active])
+}
+
+enum ProductCategory {
+  NATIONAL_TEAM
+  CLUB
+  RETRO
+  LIMITED
+}
+
+model Customer {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  phone     String?
+  cpf       String? // CPF do cliente (Brasil)
+  addresses Address[]
+  orders    Order[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Address {
+  id           String  @id @default(cuid())
+  customer     Customer @relation(fields: [customerId], references: [id])
+  customerId   String
+  cep          String // CEP brasileiro (00000-000)
+  street       String
+  number       String
+  complement   String?
+  neighborhood String // bairro
+  city         String
+  state        String // UF (SP, RJ, ...)
+  orders       Order[]
+  createdAt    DateTime @default(now())
+
+  @@index([customerId])
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  number         String      @unique // número legível do pedido
+  customer       Customer    @relation(fields: [customerId], references: [id])
+  customerId     String
+  address        Address     @relation(fields: [addressId], references: [id])
+  addressId      String
+  items          OrderItem[]
+  subtotalCents  Int
+  shippingCents  Int         @default(0)
+  totalCents     Int
+  status         OrderStatus @default(PENDING)
+  paymentMethod  String? // pix | boleto | card (definir depois)
+  trackingCode   String? // código de rastreio dos Correios
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+}
+
+model OrderItem {
+  id         String       @id @default(cuid())
+  order      Order        @relation(fields: [orderId], references: [id])
+  orderId    String
+  product    StoreProduct @relation(fields: [productId], references: [id])
+  productId  String
+  size       String
+  quantity   Int
+  priceCents Int // preço unitário no momento da compra (centavos BRL)
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+enum OrderStatus {
+  PENDING // aguardando pagamento
+  PAID // pago
+  PROCESSING // em separação
+  SHIPPED // enviado
+  DELIVERED // entregue
+  CANCELLED // cancelado
+}
