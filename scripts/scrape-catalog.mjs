@@ -139,9 +139,9 @@ function classify(title) {
   else if (isLimited) category = 'LIMITED';
   else category = 'CLUB';
 
-  let priceCents = 4499;
-  if (isRetro) priceCents = 4999;
-  if (isPlayer) priceCents = 6499;
+  let priceCents = 17990; // padrão R$179,90
+  if (isRetro) priceCents = 18990; // retrô R$189,90
+  if (isPlayer) priceCents = 21990; // versão jogador R$219,90
 
   let sizes;
   if (isKids) sizes = KIDS_SIZES;
@@ -213,7 +213,7 @@ async function main() {
         a.title,
       )}, namePt: ${JSON.stringify(namePt)}, teamName: ${JSON.stringify(
         c.team,
-      )}, league: '', season: '${season}', category: ProductCategory.${c.category}, priceCents: ${c.priceCents}, comparePriceCents: 8999, images: [IMG('${a.hash}')], sizes: ${sizesExpr}, supplierRef: 'albums/${a.id}', supplierCost: 2000, featured: false, tags: ${jsArr(
+      )}, league: '', season: '${season}', category: ProductCategory.${c.category}, priceCents: ${c.priceCents}, comparePriceCents: 29990, images: [IMG('${a.hash}')], sizes: ${sizesExpr}, supplierRef: 'albums/${a.id}', supplierCost: 8700, featured: false, tags: ${jsArr(
         c.tags,
       )} },`,
     );
