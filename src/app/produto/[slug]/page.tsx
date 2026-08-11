@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/lib/products";
 import { formatBRL, discountPercent } from "@/lib/currency";
 import { CATEGORY_LABELS } from "@/lib/categories";
+import { AddToCart } from "@/components/add-to-cart";
 
 export const dynamic = "force-dynamic";
 
@@ -66,27 +67,14 @@ export default async function ProductPage({
           )}
         </div>
 
-        <div className="mt-6">
-          <p className="text-sm font-medium mb-2">Tamanho</p>
-          <div className="flex flex-wrap gap-2">
-            {product.sizes.map((size) => (
-              <span
-                key={size}
-                className="min-w-[3rem] text-center rounded border px-3 py-2 text-sm"
-              >
-                {size}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <button
-          disabled
-          className="mt-6 w-full rounded-lg bg-manto text-white py-3 font-medium opacity-60"
-          title="Carrinho em construção"
-        >
-          Adicionar ao carrinho (em breve)
-        </button>
+        <AddToCart
+          productId={product.id}
+          slug={product.slug}
+          name={product.namePt}
+          image={product.images[0] ?? ""}
+          priceCents={product.priceCents}
+          sizes={product.sizes}
+        />
 
         <div className="mt-6 text-sm text-gray-500 space-y-1">
           <p>📦 Entrega para todo o Brasil (frete calculado por CEP)</p>
