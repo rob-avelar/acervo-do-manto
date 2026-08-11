@@ -5,6 +5,7 @@
   "description": "Loja de camisas de futebol — mercado brasileiro",
   "scripts": {
     "dev": "next dev",
+    "postinstall": "prisma generate",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
