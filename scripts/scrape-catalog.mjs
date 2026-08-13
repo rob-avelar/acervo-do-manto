@@ -223,7 +223,7 @@ async function main() {
 
 const prisma = new PrismaClient();
 
-const IMG = (hash: string) => \`https://photo.yupoo.com/13288233939/\${hash}/small.png\`;
+const IMG = (hash: string) => \`https://photo.yupoo.com/13288233939/\${hash}/small.jpg\`;
 
 const SIZES_STD = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
 const SIZES_PV = ['S', 'M', 'L', 'XL', '2XL'];

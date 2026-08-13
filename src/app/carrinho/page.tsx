@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useCart } from "@/lib/cart";
 import { formatBRL } from "@/lib/currency";
 
@@ -39,12 +38,13 @@ export default function CartPage() {
             >
               <div className="relative w-20 h-20 shrink-0 bg-gray-100 rounded overflow-hidden">
                 {item.image && (
-                  <Image
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
                     src={item.image}
                     alt={item.name}
-                    fill
-                    sizes="80px"
-                    className="object-cover"
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 )}
               </div>

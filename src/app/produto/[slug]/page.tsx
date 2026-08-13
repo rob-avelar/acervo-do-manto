@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/lib/products";
 import { formatBRL, discountPercent } from "@/lib/currency";
@@ -31,12 +30,13 @@ export default async function ProductPage({
               i === 0 ? "col-span-2" : ""
             }`}
           >
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={img}
               alt={`${product.namePt} — foto ${i + 1}`}
-              fill
-              sizes="(max-width: 768px) 100vw, 40vw"
-              className="object-cover"
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              className="absolute inset-0 w-full h-full object-cover"
             />
           </div>
         ))}

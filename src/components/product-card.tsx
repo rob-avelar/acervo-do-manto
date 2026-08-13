@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import type { StoreProduct } from "@prisma/client";
 import { formatBRL, discountPercent } from "@/lib/currency";
 
@@ -16,12 +15,13 @@ export function ProductCard({ product }: { product: StoreProduct }) {
     >
       <div className="relative aspect-square bg-gray-100">
         {product.images[0] && (
-          <Image
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
             src={product.images[0]}
             alt={product.namePt}
-            fill
-            sizes="(max-width: 640px) 50vw, 25vw"
-            className="object-cover group-hover:scale-105 transition-transform"
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform"
           />
         )}
         {desconto && (
