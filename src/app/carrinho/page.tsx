@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCart } from "@/lib/cart";
 import { formatBRL } from "@/lib/currency";
+import { proxied } from "@/lib/img";
 
 export default function CartPage() {
   const { items, subtotalCents, setQuantity, removeItem } = useCart();
@@ -40,7 +41,7 @@ export default function CartPage() {
                 {item.image && (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img
-                    src={item.image}
+                    src={proxied(item.image)}
                     alt={item.name}
                     loading="lazy"
                     referrerPolicy="no-referrer"

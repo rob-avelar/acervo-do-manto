@@ -3,6 +3,7 @@ import { getProductBySlug } from "@/lib/products";
 import { formatBRL, discountPercent } from "@/lib/currency";
 import { CATEGORY_LABELS } from "@/lib/categories";
 import { AddToCart } from "@/components/add-to-cart";
+import { proxied } from "@/lib/img";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +33,7 @@ export default async function ProductPage({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={img}
+              src={proxied(img)}
               alt={`${product.namePt} — foto ${i + 1}`}
               loading="lazy"
               referrerPolicy="no-referrer"

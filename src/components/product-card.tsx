@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { StoreProduct } from "@prisma/client";
 import { formatBRL, discountPercent } from "@/lib/currency";
+import { proxied } from "@/lib/img";
 
 export function ProductCard({ product }: { product: StoreProduct }) {
   const desconto = discountPercent(
@@ -17,7 +18,7 @@ export function ProductCard({ product }: { product: StoreProduct }) {
         {product.images[0] && (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
-            src={product.images[0]}
+            src={proxied(product.images[0])}
             alt={product.namePt}
             loading="lazy"
             referrerPolicy="no-referrer"
