@@ -21,6 +21,9 @@ export function ProductCard({ product }: { product: StoreProduct }) {
             src={proxied(product.images[0])}
             alt={product.namePt}
             loading="lazy"
+            decoding="async"
+            width={400}
+            height={400}
             referrerPolicy="no-referrer"
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform"
           />
