@@ -24,9 +24,21 @@ export default async function CatalogPage({
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Camisas de Futebol</h1>
+        <h1 className="text-2xl font-bold">
+          {search ? `Resultados para “${search}”` : "Camisas de Futebol"}
+        </h1>
         <p className="text-gray-500">
-          {total} produtos · entrega para todo o Brasil
+          {total} {total === 1 ? "produto" : "produtos"}
+          {search ? (
+            <>
+              {" "}encontrado{total === 1 ? "" : "s"} ·{" "}
+              <a href="/" className="text-manto underline">
+                limpar busca
+              </a>
+            </>
+          ) : (
+            " · entrega para todo o Brasil"
+          )}
         </p>
       </div>
 
