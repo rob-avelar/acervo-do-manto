@@ -91,8 +91,8 @@ const NATIONS = new Set(
 );
 
 const KIDS_SIZES = ['16', '18', '20', '22', '24', '26', '28'];
-const SIZES_STD = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
-const SIZES_PV = ['S', 'M', 'L', 'XL', '2XL'];
+const SIZES_STD = ['P', 'M', 'G', 'GG', '3G', '4G', '5G'];
+const SIZES_PV = ['P', 'M', 'G', 'GG', '3G'];
 
 function slugify(s) {
   return s
@@ -167,6 +167,74 @@ function jsArr(arr) {
   return `[${arr.map((s) => `'${s.replace(/'/g, "\\'")}'`).join(', ')}]`;
 }
 
+// Países (seleções) em português — para nome e teamName.
+const COUNTRY_PT = {
+  Brazil: 'Brasil', Spain: 'Espanha', Germany: 'Alemanha', England: 'Inglaterra',
+  France: 'França', Italy: 'Itália', Mexico: 'México', Netherlands: 'Holanda',
+  Croatia: 'Croácia', Belgium: 'Bélgica', Switzerland: 'Suíça', Norway: 'Noruega',
+  Austria: 'Áustria', Scotland: 'Escócia', Algeria: 'Argélia', Morocco: 'Marrocos',
+  Tunisia: 'Tunísia', 'South Africa': 'África do Sul', Senegal: 'Senegal', Ghana: 'Gana',
+  Egypt: 'Egito', 'Cape Verde': 'Cabo Verde', 'Ivory Coast': 'Costa do Marfim',
+  Colombia: 'Colômbia', Ecuador: 'Equador', Uruguay: 'Uruguai', Paraguay: 'Paraguai',
+  Japan: 'Japão', 'South Korea': 'Coreia do Sul', Australia: 'Austrália',
+  'Saudi Arabia': 'Arábia Saudita', Iran: 'Irã', Jordan: 'Jordânia', Qatar: 'Catar',
+  Uzbekistan: 'Uzbequistão', Panama: 'Panamá', Haiti: 'Haiti', Curacao: 'Curaçao',
+  'New Zealand': 'Nova Zelândia', Bosnia: 'Bósnia', 'Czech Republic': 'República Tcheca',
+  Turkiye: 'Turquia', Sweden: 'Suécia', Congo: 'Congo', 'DR Congo': 'RD Congo',
+  Iraq: 'Iraque', USA: 'Estados Unidos', Canada: 'Canadá', Ireland: 'Irlanda',
+  Wales: 'País de Gales', Bolivia: 'Bolívia', Chile: 'Chile', Peru: 'Peru',
+  Venezuela: 'Venezuela', Nigeria: 'Nigéria', Cameroon: 'Camarões', Jamaica: 'Jamaica',
+  Denmark: 'Dinamarca', Poland: 'Polônia', Serbia: 'Sérvia', Greece: 'Grécia',
+  Ukraine: 'Ucrânia', Russia: 'Rússia', Portugal: 'Portugal', Argentina: 'Argentina',
+};
+
+function teamPt(team) {
+  return COUNTRY_PT[team] ?? team;
+}
+
+// Substituições ordenadas (multi-palavra primeiro) para traduzir o título.
+const NAME_REPLACEMENTS = [
+  [/\bWorld Cup\b/gi, 'Copa do Mundo'],
+  [/\bPlayer Version\b/gi, 'Versão Jogador'],
+  [/\bLong Sleeve\b/gi, 'Manga Longa'],
+  [/\bKids Kit\b/gi, 'Infantil'],
+  [/\bPre[-\s]?Match\b/gi, 'Pré-Jogo'],
+  [/\bGoalkeeper\b/gi, 'Goleiro'],
+  [/\bWomen'?s?\b/gi, 'Feminina'],
+  [/\bAnniversary\b/gi, 'Aniversário'],
+  [/\bSpecial\b/gi, 'Especial'],
+  [/\bConcept\b/gi, 'Conceito'],
+  [/\bRetro\b/gi, 'Retrô'],
+  [/\bHome\b/gi, 'Casa'],
+  [/\bAway\b/gi, 'Fora'],
+  [/\bThird\b/gi, 'Terceira'],
+  [/\bFourth\b/gi, 'Quarta'],
+  [/\bFootball Jersey\b/gi, ''],
+  [/\bJersey\b/gi, ''],
+];
+
+// Monta o nome em português a partir do título em inglês.
+function namePtFrom(title, isKids) {
+  let s = title;
+  // Remove sufixo de tamanho: "S-4XL", "S-XXL", "Size：16-28", etc.
+  s = s.replace(/\s+(S-\d?XL|S-XXL|S-XL|Size\s*[:：]\s*[\d-]+)\s*$/i, '');
+  // Temporadas: "2026-27" e "26-27" → "26/27"; "95-96" → "95/96"
+  s = s.replace(/\b20(\d{2})-(\d{2})\b/g, '$1/$2');
+  s = s.replace(/\b(\d{2})-(\d{2})\b/g, '$1/$2');
+  // Traduz termos
+  for (const [re, to] of NAME_REPLACEMENTS) s = s.replace(re, to);
+  // Traduz nome de país no começo (seleções)
+  for (const [en, pt] of Object.entries(COUNTRY_PT)) {
+    s = s.replace(new RegExp(`^${en}\\b`), pt);
+  }
+  s = s.replace(/\s{2,}/g, ' ').trim();
+  if (isKids) {
+    s = s.replace(/\bInfantil\b/i, '').replace(/\s{2,}/g, ' ').trim();
+    return `Kit Infantil ${s}`;
+  }
+  return `Camisa ${s}`;
+}
+
 // ---------------------------------------------------------------------------
 // 3. Main
 // ---------------------------------------------------------------------------
@@ -204,7 +272,9 @@ async function main() {
     usedSlugs.add(slug);
 
     const season = extractSeason(a.title);
-    const namePt = `Camisa ${a.title}`;
+    const isKids = /16-28/.test(a.title) || /\bkids\b/i.test(a.title);
+    const namePt = namePtFrom(a.title, isKids);
+    const teamName = teamPt(c.team);
     const sizesExpr =
       typeof c.sizes === 'string' ? c.sizes : jsArr(c.sizes);
 
@@ -212,7 +282,7 @@ async function main() {
       `  { slug: '${slug}', nameEn: ${JSON.stringify(a.title)}, nameNl: ${JSON.stringify(
         a.title,
       )}, namePt: ${JSON.stringify(namePt)}, teamName: ${JSON.stringify(
-        c.team,
+        teamName,
       )}, league: '', season: '${season}', category: ProductCategory.${c.category}, priceCents: ${c.priceCents}, comparePriceCents: 29990, images: [IMG('${a.hash}')], sizes: ${sizesExpr}, supplierRef: 'albums/${a.id}', supplierCost: 8700, featured: false, tags: ${jsArr(
         c.tags,
       )} },`,
@@ -225,8 +295,8 @@ const prisma = new PrismaClient();
 
 const IMG = (hash: string) => \`https://photo.yupoo.com/13288233939/\${hash}/small.jpg\`;
 
-const SIZES_STD = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
-const SIZES_PV = ['S', 'M', 'L', 'XL', '2XL'];
+const SIZES_STD = ['P', 'M', 'G', 'GG', '3G', '4G', '5G'];
+const SIZES_PV = ['P', 'M', 'G', 'GG', '3G'];
 
 const products = [
 `;
