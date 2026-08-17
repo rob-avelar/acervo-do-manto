@@ -136,27 +136,30 @@ export default async function HomePage({
 
 function Hero() {
   return (
-    <section className="relative overflow-hidden border-b border-ink-600">
-      <div className="absolute inset-0 bg-gradient-to-br from-ink via-ink-800 to-ink" />
-      <div
-        className="absolute inset-0 opacity-20"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 20% 30%, rgba(212,175,55,0.35), transparent 40%), radial-gradient(circle at 80% 70%, rgba(10,125,44,0.35), transparent 40%)",
-        }}
-      />
-      <div className="relative mx-auto max-w-6xl px-4 py-20 md:py-28 text-center">
+    <section className="border-b border-ink-600">
+      {/* Banner */}
+      <div className="w-full bg-ink">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/banner.png"
+          alt="Acervo do Manto — camisas clássicas de futebol"
+          className="w-full h-auto object-cover max-h-[520px]"
+        />
+      </div>
+      {/* Chamada + botões */}
+      <div className="mx-auto max-w-6xl px-4 py-8 text-center">
         <p className="text-gold font-semibold tracking-[0.2em] text-xs md:text-sm uppercase">
-          Copa 2026 · Coleção completa
+          Camisas clássicas · Brasil &amp; Europa
         </p>
-        <h1 className="mt-4 font-display text-4xl md:text-6xl font-bold leading-tight">
-          Vista o <span className="text-gradient-gold">manto</span> do seu time
+        <h1 className="mt-3 font-display text-3xl md:text-5xl font-bold leading-tight">
+          Vista a <span className="text-gradient-gold">história</span> do
+          futebol
         </h1>
-        <p className="mt-4 text-gray-300 max-w-xl mx-auto">
+        <p className="mt-3 text-gray-300 max-w-xl mx-auto">
           Milhares de camisas de clubes e seleções, retrôs e edições limitadas.
           Entrega para todo o Brasil.
         </p>
-        <div className="mt-8 flex flex-wrap gap-3 justify-center">
+        <div className="mt-6 flex flex-wrap gap-3 justify-center">
           <Link
             href="/?categoria=NATIONAL_TEAM"
             className="rounded-lg bg-gold text-ink px-6 py-3 font-semibold hover:bg-gold-light transition-colors"
@@ -164,10 +167,10 @@ function Hero() {
             Ver seleções
           </Link>
           <Link
-            href="/?categoria=CLUB"
+            href="/?categoria=RETRO"
             className="rounded-lg border border-gold/50 text-gold px-6 py-3 font-semibold hover:bg-gold/10 transition-colors"
           >
-            Ver clubes
+            Ver retrôs
           </Link>
         </div>
       </div>

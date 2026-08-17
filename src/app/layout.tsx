@@ -39,10 +39,13 @@ export default function RootLayout({
           <header className="sticky top-0 z-40 bg-ink/95 backdrop-blur border-b border-ink-600">
             <div className="mx-auto max-w-6xl px-4 py-3 flex flex-wrap items-center gap-x-6 gap-y-3">
               <Link href="/" className="shrink-0 flex items-center gap-2">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-gold-light to-gold-dark text-ink font-display font-bold">
-                  AM
-                </span>
-                <span className="font-display text-xl font-bold tracking-wide">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logo.png"
+                  alt="Acervo do Manto"
+                  className="h-12 w-12 rounded-full object-cover"
+                />
+                <span className="font-display text-xl font-bold tracking-wide hidden sm:inline">
                   ACERVO <span className="text-gradient-gold">DO MANTO</span>
                 </span>
               </Link>
