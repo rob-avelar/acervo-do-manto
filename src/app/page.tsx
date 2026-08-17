@@ -137,44 +137,46 @@ export default async function HomePage({
 
 function Hero() {
   return (
-    <section className="border-b border-ink-600">
-      {/* Banner */}
-      <div className="w-full bg-ink">
-        <Image
-          src="/banner.png"
-          alt="Acervo do Manto — camisas clássicas de futebol"
-          width={2752}
-          height={1536}
-          priority
-          className="w-full h-auto"
-        />
-      </div>
-      {/* Chamada + botões */}
-      <div className="mx-auto max-w-6xl px-4 py-8 text-center">
-        <p className="text-gold font-semibold tracking-[0.2em] text-xs md:text-sm uppercase">
-          Camisas clássicas · Brasil &amp; Europa
-        </p>
-        <h1 className="mt-3 font-display text-3xl md:text-5xl font-bold leading-tight">
-          Vista a <span className="text-gradient-gold">história</span> do
-          futebol
-        </h1>
-        <p className="mt-3 text-gray-300 max-w-xl mx-auto">
-          Milhares de camisas de clubes e seleções, retrôs e edições limitadas.
-          Entrega para todo o Brasil.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3 justify-center">
-          <Link
-            href="/?categoria=NATIONAL_TEAM"
-            className="rounded-lg bg-gold text-ink px-6 py-3 font-semibold hover:bg-gold-light transition-colors"
-          >
-            Ver seleções
-          </Link>
-          <Link
-            href="/?categoria=RETRO"
-            className="rounded-lg border border-gold/50 text-gold px-6 py-3 font-semibold hover:bg-gold/10 transition-colors"
-          >
-            Ver retrôs
-          </Link>
+    <section className="relative border-b border-ink-600 overflow-hidden">
+      {/* Imagem de fundo */}
+      <Image
+        src="/banner.png"
+        alt="Acervo do Manto — camisas clássicas de futebol"
+        width={2438}
+        height={810}
+        priority
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      {/* Gradiente para leitura do texto */}
+      <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/70 to-transparent" />
+      {/* Conteúdo */}
+      <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
+        <div className="max-w-xl">
+          <p className="text-gold font-semibold tracking-[0.2em] text-xs md:text-sm uppercase">
+            Camisas clássicas · Brasil &amp; Europa
+          </p>
+          <h1 className="mt-3 font-display text-4xl md:text-6xl font-bold leading-tight">
+            Vista a <span className="text-gradient-gold">história</span> do
+            futebol
+          </h1>
+          <p className="mt-4 text-gray-200 max-w-md">
+            Milhares de camisas de clubes e seleções, retrôs e edições
+            limitadas. Entrega para todo o Brasil.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/?categoria=NATIONAL_TEAM"
+              className="rounded-lg bg-gold text-ink px-6 py-3 font-semibold hover:bg-gold-light transition-colors"
+            >
+              Ver seleções
+            </Link>
+            <Link
+              href="/?categoria=RETRO"
+              className="rounded-lg border border-gold/50 text-gold px-6 py-3 font-semibold hover:bg-gold/10 transition-colors bg-ink/40 backdrop-blur-sm"
+            >
+              Ver retrôs
+            </Link>
+          </div>
         </div>
       </div>
     </section>
