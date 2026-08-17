@@ -38,16 +38,13 @@ export default function RootLayout({
           {/* Header */}
           <header className="sticky top-0 z-40 bg-ink/95 backdrop-blur border-b border-ink-600">
             <div className="mx-auto max-w-6xl px-4 py-3 flex flex-wrap items-center gap-x-6 gap-y-3">
-              <Link href="/" className="shrink-0 flex items-center gap-2">
+              <Link href="/" className="shrink-0 flex items-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/logo.png"
                   alt="Acervo do Manto"
-                  className="h-12 w-12 rounded-full object-cover"
+                  className="h-14 w-auto object-contain"
                 />
-                <span className="font-display text-xl font-bold tracking-wide hidden sm:inline">
-                  ACERVO <span className="text-gradient-gold">DO MANTO</span>
-                </span>
               </Link>
               <div className="order-3 w-full md:order-none md:flex-1 md:w-auto">
                 <Suspense fallback={null}>

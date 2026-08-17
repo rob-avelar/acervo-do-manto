@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   listProducts,
   getHighlights,
@@ -139,10 +140,12 @@ function Hero() {
     <section className="border-b border-ink-600">
       {/* Banner */}
       <div className="w-full bg-ink">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src="/banner.png"
           alt="Acervo do Manto — camisas clássicas de futebol"
+          width={2752}
+          height={1536}
+          priority
           className="w-full h-auto object-cover max-h-[520px]"
         />
       </div>
