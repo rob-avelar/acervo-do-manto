@@ -146,7 +146,7 @@ function Hero() {
           width={2752}
           height={1536}
           priority
-          className="w-full h-auto object-cover max-h-[520px]"
+          className="w-full h-auto"
         />
       </div>
       {/* Chamada + botões */}
