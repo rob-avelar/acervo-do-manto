@@ -96,9 +96,9 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-16">
-        <h1 className="text-2xl font-bold mb-2">Carrinho vazio</h1>
-        <Link href="/" className="text-manto underline">
+      <div className="mx-auto max-w-6xl px-4 text-center py-24">
+        <h1 className="font-display text-3xl font-bold mb-2">Carrinho vazio</h1>
+        <Link href="/" className="text-gold underline">
           Ver catálogo
         </Link>
       </div>
@@ -106,11 +106,11 @@ export default function CheckoutPage() {
   }
 
   const input =
-    "w-full rounded border px-3 py-2 text-sm focus:outline-none focus:border-manto";
+    "w-full rounded-lg border border-ink-600 bg-ink-800 text-white placeholder-gray-500 px-3 py-2 text-sm focus:outline-none focus:border-gold";
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Finalizar pedido</h1>
+    <div className="mx-auto max-w-6xl px-4 py-8">
+      <h1 className="font-display text-3xl font-bold mb-6">Finalizar pedido</h1>
       <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           {/* Dados do cliente */}
@@ -218,15 +218,15 @@ export default function CheckoutPage() {
         </div>
 
         {/* Resumo */}
-        <div className="border rounded-lg p-4 h-fit">
-          <h2 className="font-bold mb-4">Seu pedido</h2>
+        <div className="border border-ink-600 bg-ink-800 rounded-xl p-5 h-fit">
+          <h2 className="font-display text-xl font-bold mb-4">Seu pedido</h2>
           <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
             {items.map((i) => (
               <div
                 key={`${i.slug}-${i.size}`}
                 className="flex justify-between text-sm"
               >
-                <span className="text-gray-600 truncate pr-2">
+                <span className="text-gray-300 truncate pr-2">
                   {i.quantity}× {i.name} ({i.size})
                 </span>
                 <span className="whitespace-nowrap">
@@ -235,31 +235,31 @@ export default function CheckoutPage() {
               </div>
             ))}
           </div>
-          <div className="border-t pt-3 space-y-1 text-sm">
+          <div className="border-t border-ink-600 pt-3 space-y-1 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-500">Subtotal</span>
+              <span className="text-gray-400">Subtotal</span>
               <span>{formatBRL(subtotalCents)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Frete</span>
+              <span className="text-gray-400">Frete</span>
               <span>
                 {shippingCents === 0 ? "Grátis" : formatBRL(shippingCents)}
               </span>
             </div>
             <div className="flex justify-between font-bold text-base pt-1">
               <span>Total</span>
-              <span className="text-manto">{formatBRL(totalCents)}</span>
+              <span className="text-gold">{formatBRL(totalCents)}</span>
             </div>
           </div>
 
           {error && (
-            <p className="mt-3 text-sm text-red-500">{error}</p>
+            <p className="mt-3 text-sm text-red-400">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="mt-4 w-full rounded-lg bg-manto text-white py-3 font-medium disabled:opacity-50"
+            className="mt-4 w-full rounded-lg bg-gold text-ink py-3 font-semibold hover:bg-gold-light transition-colors disabled:opacity-50"
           >
             {loading ? "Enviando..." : "Confirmar pedido"}
           </button>

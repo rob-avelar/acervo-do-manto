@@ -12,9 +12,9 @@ export function ProductCard({ product }: { product: StoreProduct }) {
   return (
     <Link
       href={`/produto/${product.slug}`}
-      className="group block rounded-lg border bg-white overflow-hidden hover:shadow-md transition-shadow"
+      className="group block rounded-xl border border-ink-600 bg-ink-800 overflow-hidden hover:border-gold/60 transition-colors"
     >
-      <div className="relative aspect-square bg-gray-100">
+      <div className="relative aspect-square bg-ink-700">
         {product.images[0] && (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
@@ -25,26 +25,28 @@ export function ProductCard({ product }: { product: StoreProduct }) {
             width={400}
             height={400}
             referrerPolicy="no-referrer"
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform"
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         )}
         {desconto && (
-          <span className="absolute top-2 left-2 rounded bg-manto-accent text-black text-xs font-bold px-2 py-1">
+          <span className="absolute top-2 left-2 rounded bg-gold text-ink text-xs font-bold px-2 py-1">
             -{desconto}%
           </span>
         )}
       </div>
       <div className="p-3">
-        <p className="text-xs text-gray-500">{product.teamName}</p>
-        <h3 className="text-sm font-medium line-clamp-2 min-h-[2.5rem]">
+        <p className="text-xs text-gold/80 uppercase tracking-wide">
+          {product.teamName}
+        </p>
+        <h3 className="text-sm font-medium line-clamp-2 min-h-[2.5rem] mt-0.5 text-gray-100">
           {product.namePt}
         </h3>
         <div className="mt-1 flex items-baseline gap-2">
-          <span className="font-bold text-manto">
+          <span className="font-bold text-white">
             {formatBRL(product.priceCents)}
           </span>
           {product.comparePriceCents && (
-            <span className="text-xs text-gray-400 line-through">
+            <span className="text-xs text-gray-500 line-through">
               {formatBRL(product.comparePriceCents)}
             </span>
           )}

@@ -10,14 +10,16 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-16">
-        <h1 className="text-2xl font-bold mb-2">Seu carrinho está vazio</h1>
-        <p className="text-gray-500 mb-6">
+      <div className="mx-auto max-w-6xl px-4 text-center py-24">
+        <h1 className="font-display text-3xl font-bold mb-2">
+          Seu carrinho está vazio
+        </h1>
+        <p className="text-gray-400 mb-6">
           Adicione camisas pra começar seu pedido.
         </p>
         <Link
           href="/"
-          className="inline-block rounded-lg bg-manto text-white px-6 py-3 font-medium"
+          className="inline-block rounded-lg bg-gold text-ink px-6 py-3 font-semibold hover:bg-gold-light"
         >
           Ver catálogo
         </Link>
@@ -26,8 +28,8 @@ export default function CartPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Carrinho</h1>
+    <div className="mx-auto max-w-6xl px-4 py-8">
+      <h1 className="font-display text-3xl font-bold mb-6">Carrinho</h1>
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Itens */}
@@ -35,9 +37,9 @@ export default function CartPage() {
           {items.map((item) => (
             <div
               key={`${item.slug}-${item.size}`}
-              className="flex gap-4 border rounded-lg p-3"
+              className="flex gap-4 border border-ink-600 bg-ink-800 rounded-xl p-3"
             >
-              <div className="relative w-20 h-20 shrink-0 bg-gray-100 rounded overflow-hidden">
+              <div className="relative w-20 h-20 shrink-0 bg-ink-700 rounded-lg overflow-hidden">
                 {item.image && (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img
@@ -52,15 +54,15 @@ export default function CartPage() {
               <div className="flex-1 min-w-0">
                 <Link
                   href={`/produto/${item.slug}`}
-                  className="text-sm font-medium line-clamp-2 hover:text-manto"
+                  className="text-sm font-medium line-clamp-2 hover:text-gold text-gray-100"
                 >
                   {item.name}
                 </Link>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-gray-400 mt-0.5">
                   Tamanho: {item.size}
                 </p>
                 <div className="mt-2 flex items-center gap-3">
-                  <div className="flex items-center border rounded">
+                  <div className="flex items-center border border-ink-600 rounded-lg">
                     <button
                       type="button"
                       className="px-2 py-1 text-lg leading-none"
@@ -90,7 +92,7 @@ export default function CartPage() {
                   </button>
                 </div>
               </div>
-              <div className="text-right text-sm font-bold text-manto whitespace-nowrap">
+              <div className="text-right text-sm font-bold text-white whitespace-nowrap">
                 {formatBRL(item.priceCents * item.quantity)}
               </div>
             </div>
@@ -98,25 +100,25 @@ export default function CartPage() {
         </div>
 
         {/* Resumo */}
-        <div className="border rounded-lg p-4 h-fit">
-          <h2 className="font-bold mb-4">Resumo</h2>
+        <div className="border border-ink-600 bg-ink-800 rounded-xl p-5 h-fit">
+          <h2 className="font-display text-xl font-bold mb-4">Resumo</h2>
           <div className="flex justify-between text-sm mb-2">
-            <span className="text-gray-500">Subtotal</span>
+            <span className="text-gray-400">Subtotal</span>
             <span>{formatBRL(subtotalCents)}</span>
           </div>
           <div className="flex justify-between text-sm mb-4">
-            <span className="text-gray-500">Frete</span>
-            <span className="text-gray-400">calculado no checkout</span>
+            <span className="text-gray-400">Frete</span>
+            <span className="text-gray-500">calculado no checkout</span>
           </div>
           <Link
             href="/checkout"
-            className="block text-center rounded-lg bg-manto text-white py-3 font-medium"
+            className="block text-center rounded-lg bg-gold text-ink py-3 font-semibold hover:bg-gold-light transition-colors"
           >
             Finalizar pedido
           </Link>
           <Link
             href="/"
-            className="block text-center text-sm text-gray-500 mt-3 hover:text-manto"
+            className="block text-center text-sm text-gray-400 mt-3 hover:text-gold"
           >
             Continuar comprando
           </Link>

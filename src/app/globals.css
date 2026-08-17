@@ -3,11 +3,36 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
+  --background: #0b0b0e;
+  --foreground: #f5f5f7;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar discreta no tema escuro */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #141419;
+}
+::-webkit-scrollbar-thumb {
+  background: #33333c;
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444450;
+}
+
+/* Realce dourado reutilizável */
+.text-gradient-gold {
+  background: linear-gradient(90deg, #e8c860, #d4af37 60%, #a8862a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }

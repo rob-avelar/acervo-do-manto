@@ -21,13 +21,13 @@ export default async function ProductPage({
   );
 
   return (
-    <div className="grid md:grid-cols-2 gap-8">
+    <div className="mx-auto max-w-6xl px-4 py-8 grid md:grid-cols-2 gap-8">
       {/* Galeria */}
       <div className="grid grid-cols-2 gap-2">
         {product.images.map((img, i) => (
           <div
             key={img}
-            className={`relative aspect-square bg-gray-100 rounded-lg overflow-hidden ${
+            className={`relative aspect-square bg-ink-700 rounded-xl overflow-hidden border border-ink-600 ${
               i === 0 ? "col-span-2" : ""
             }`}
           >
@@ -45,24 +45,28 @@ export default async function ProductPage({
 
       {/* Info */}
       <div>
-        <p className="text-sm text-gray-500">{product.teamName}</p>
-        <h1 className="text-2xl font-bold">{product.namePt}</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          {CATEGORY_LABELS[product.category]} · {product.league} ·{" "}
-          {product.season}
+        <p className="text-sm text-gold/80 uppercase tracking-wide">
+          {product.teamName}
+        </p>
+        <h1 className="font-display text-3xl font-bold mt-1">
+          {product.namePt}
+        </h1>
+        <p className="mt-1 text-sm text-gray-400">
+          {CATEGORY_LABELS[product.category]}
+          {product.season ? ` · ${product.season}` : ""}
         </p>
 
         <div className="mt-4 flex items-baseline gap-3">
-          <span className="text-3xl font-bold text-manto">
+          <span className="text-3xl font-bold text-white">
             {formatBRL(product.priceCents)}
           </span>
           {product.comparePriceCents && (
-            <span className="text-lg text-gray-400 line-through">
+            <span className="text-lg text-gray-500 line-through">
               {formatBRL(product.comparePriceCents)}
             </span>
           )}
           {desconto && (
-            <span className="rounded bg-manto-accent text-black text-sm font-bold px-2 py-0.5">
+            <span className="rounded bg-gold text-ink text-sm font-bold px-2 py-0.5">
               -{desconto}%
             </span>
           )}
@@ -77,9 +81,10 @@ export default async function ProductPage({
           sizes={product.sizes}
         />
 
-        <div className="mt-6 text-sm text-gray-500 space-y-1">
+        <div className="mt-6 rounded-xl border border-ink-600 bg-ink-800 p-4 text-sm text-gray-300 space-y-1">
           <p>📦 Entrega para todo o Brasil (frete calculado por CEP)</p>
           <p>💳 Pix, boleto e cartão</p>
+          <p>🔁 Troca fácil por tamanho</p>
         </div>
       </div>
     </div>

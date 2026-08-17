@@ -49,3 +49,49 @@ export async function getFeaturedProducts(limit = 8) {
     take: limit,
   });
 }
+
+// Times de destaque para a vitrine da home.
+const MARQUEE_TEAMS = [
+  "Flamengo",
+  "Brasil",
+  "Real Madrid",
+  "Corinthians",
+  "Barcelona",
+  "Palmeiras",
+  "Argentina",
+  "PSG",
+];
+
+/** Uma camisa de cada time de destaque (para a seção "Destaques"). */
+export async function getHighlights(limit = 8) {
+  const items = await prisma.storeProduct.findMany({
+    where: { active: true, teamName: { in: MARQUEE_TEAMS } },
+    distinct: ["teamName"],
+    take: limit,
+  });
+  if (items.length >= 4) return items;
+  // fallback: primeiros produtos
+  return prisma.storeProduct.findMany({ where: { active: true }, take: limit });
+}
+
+/** Uma imagem representativa por categoria (para os blocos da vitrine). */
+export async function getCategoryTiles() {
+  const cats: ProductCategory[] = [
+    "NATIONAL_TEAM",
+    "CLUB",
+    "RETRO",
+    "LIMITED",
+  ] as ProductCategory[];
+  const results = await Promise.all(
+    cats.map((c) =>
+      prisma.storeProduct.findFirst({
+        where: { active: true, category: c, images: { isEmpty: false } },
+        select: { images: true },
+      }),
+    ),
+  );
+  return cats.map((category, i) => ({
+    category,
+    image: results[i]?.images[0] ?? null,
+  }));
+}

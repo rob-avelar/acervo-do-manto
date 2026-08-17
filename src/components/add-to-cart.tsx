@@ -37,10 +37,10 @@ export function AddToCart({
   return (
     <div>
       <div className="mt-6">
-        <p className="text-sm font-medium mb-2">
+        <p className="text-sm font-medium mb-2 text-gray-200">
           Tamanho{" "}
           {!size && (
-            <span className="text-manto-accent">— selecione um tamanho</span>
+            <span className="text-gold">— selecione um tamanho</span>
           )}
         </p>
         <div className="flex flex-wrap gap-2">
@@ -49,10 +49,10 @@ export function AddToCart({
               key={s}
               type="button"
               onClick={() => setSize(s)}
-              className={`min-w-[3rem] text-center rounded border px-3 py-2 text-sm transition-colors ${
+              className={`min-w-[3rem] text-center rounded-lg border px-3 py-2 text-sm transition-colors ${
                 size === s
-                  ? "border-manto bg-manto text-white"
-                  : "hover:border-manto"
+                  ? "border-gold bg-gold text-ink font-semibold"
+                  : "border-ink-600 text-gray-200 hover:border-gold"
               }`}
             >
               {s}
@@ -66,7 +66,7 @@ export function AddToCart({
           type="button"
           disabled={!size}
           onClick={() => handleAdd(false)}
-          className="w-full rounded-lg bg-manto text-white py-3 font-medium disabled:opacity-40"
+          className="w-full rounded-lg bg-gold text-ink py-3 font-semibold hover:bg-gold-light transition-colors disabled:opacity-40"
         >
           {added ? "Adicionado ✓" : "Adicionar ao carrinho"}
         </button>
@@ -74,7 +74,7 @@ export function AddToCart({
           type="button"
           disabled={!size}
           onClick={() => handleAdd(true)}
-          className="w-full rounded-lg border border-manto text-manto py-3 font-medium disabled:opacity-40"
+          className="w-full rounded-lg border border-gold/50 text-gold py-3 font-semibold hover:bg-gold/10 transition-colors disabled:opacity-40"
         >
           Comprar agora
         </button>
