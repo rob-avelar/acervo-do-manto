@@ -177,6 +177,19 @@ function Hero() {
               Ver retrôs
             </Link>
           </div>
+
+          {/* Selo de qualidade */}
+          <div className="mt-8 inline-flex items-center gap-3 rounded-full border border-gold/40 bg-ink/60 backdrop-blur-sm pl-2 pr-5 py-2">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-gold-light to-gold-dark text-ink text-lg">
+              🏆
+            </span>
+            <span className="text-sm">
+              <strong className="text-gold">+1.000 peças vendidas</strong>
+              <span className="block text-xs text-gray-300">
+                Qualidade garantida · Milhares de clientes
+              </span>
+            </span>
+          </div>
         </div>
       </div>
     </section>

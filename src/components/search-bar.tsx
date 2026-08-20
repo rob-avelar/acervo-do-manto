@@ -1,12 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export function SearchBar() {
   const router = useRouter();
   const params = useSearchParams();
-  const [q, setQ] = useState(params.get("busca") ?? "");
+  const busca = params.get("busca") ?? "";
+  const [q, setQ] = useState(busca);
+
+  // Sincroniza o campo com a URL (ex: ao voltar ao início, limpa a busca)
+  useEffect(() => {
+    setQ(busca);
+  }, [busca]);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
