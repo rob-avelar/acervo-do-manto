@@ -12,8 +12,8 @@ export const CURRENCIES: Record<
   { code: string; locale: string; rate: number }
 > = {
   BRL: { code: "BRL", locale: "pt-BR", rate: 1 },
-  USD: { code: "USD", locale: "en-US", rate: 0.18 },
-  EUR: { code: "EUR", locale: "de-DE", rate: 0.17 },
+  USD: { code: "USD", locale: "en-US", rate: 0.222 },
+  EUR: { code: "EUR", locale: "de-DE", rate: 0.195 },
 };
 
 /**
