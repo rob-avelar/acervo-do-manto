@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { formatBRL } from "@/lib/currency";
+import { formatMoney } from "@/lib/currency";
+import { getServerCurrency } from "@/lib/currency-server";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,7 @@ export default async function OrderPage({
   });
 
   if (!order) notFound();
+  const currency = getServerCurrency();
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
@@ -43,25 +45,25 @@ export default async function OrderPage({
             <span className="text-gray-300">
               {it.quantity}× {it.product.namePt} ({it.size})
             </span>
-            <span>{formatBRL(it.priceCents * it.quantity)}</span>
+            <span>{formatMoney(it.priceCents * it.quantity, currency)}</span>
           </div>
         ))}
         <div className="border-t border-ink-600 pt-3 space-y-1 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-400">Subtotal</span>
-            <span>{formatBRL(order.subtotalCents)}</span>
+            <span>{formatMoney(order.subtotalCents, currency)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Frete</span>
             <span>
               {order.shippingCents === 0
                 ? "Grátis"
-                : formatBRL(order.shippingCents)}
+                : formatMoney(order.shippingCents, currency)}
             </span>
           </div>
           <div className="flex justify-between font-bold text-base">
             <span>Total</span>
-            <span className="text-gold">{formatBRL(order.totalCents)}</span>
+            <span className="text-gold">{formatMoney(order.totalCents, currency)}</span>
           </div>
         </div>
       </div>

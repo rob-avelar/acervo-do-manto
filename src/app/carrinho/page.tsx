@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useCart } from "@/lib/cart";
-import { formatBRL } from "@/lib/currency";
+import { formatMoney } from "@/lib/currency";
+import { useCurrency } from "@/lib/use-currency";
 import { proxied } from "@/lib/img";
 
 export default function CartPage() {
   const { items, subtotalCents, setQuantity, removeItem } = useCart();
+  const currency = useCurrency();
 
   if (items.length === 0) {
     return (
@@ -93,7 +95,7 @@ export default function CartPage() {
                 </div>
               </div>
               <div className="text-right text-sm font-bold text-white whitespace-nowrap">
-                {formatBRL(item.priceCents * item.quantity)}
+                {formatMoney(item.priceCents * item.quantity, currency)}
               </div>
             </div>
           ))}
@@ -104,7 +106,7 @@ export default function CartPage() {
           <h2 className="font-display text-xl font-bold mb-4">Resumo</h2>
           <div className="flex justify-between text-sm mb-2">
             <span className="text-gray-400">Subtotal</span>
-            <span>{formatBRL(subtotalCents)}</span>
+            <span>{formatMoney(subtotalCents, currency)}</span>
           </div>
           <div className="flex justify-between text-sm mb-4">
             <span className="text-gray-400">Frete</span>

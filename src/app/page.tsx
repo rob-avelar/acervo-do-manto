@@ -8,6 +8,7 @@ import {
 import { ProductCard } from "@/components/product-card";
 import { CATEGORY_LABELS, CATEGORY_ORDER } from "@/lib/categories";
 import { proxied } from "@/lib/img";
+import { getServerCurrency } from "@/lib/currency-server";
 import type { ProductCategory } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +22,7 @@ export default async function HomePage({
   const search = searchParams.busca;
   const page = Number(searchParams.pagina ?? "1");
   const isBrowsing = Boolean(category || search || page > 1);
+  const currency = getServerCurrency();
 
   const { items, total, pages } = await listProducts({
     category,
@@ -50,7 +52,7 @@ export default async function HomePage({
                 />
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                   {highlights.map((p) => (
-                    <ProductCard key={p.id} product={p} />
+                    <ProductCard key={p.id} product={p} currency={currency} />
                   ))}
                 </div>
               </section>
@@ -101,7 +103,7 @@ export default async function HomePage({
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {items.map((p) => (
-                <ProductCard key={p.id} product={p} />
+                <ProductCard key={p.id} product={p} currency={currency} />
               ))}
             </div>
           )}

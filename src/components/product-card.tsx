@@ -1,9 +1,15 @@
 import Link from "next/link";
 import type { StoreProduct } from "@prisma/client";
-import { formatBRL, discountPercent } from "@/lib/currency";
+import { formatMoney, discountPercent, type Currency } from "@/lib/currency";
 import { proxied } from "@/lib/img";
 
-export function ProductCard({ product }: { product: StoreProduct }) {
+export function ProductCard({
+  product,
+  currency = "BRL",
+}: {
+  product: StoreProduct;
+  currency?: Currency;
+}) {
   const desconto = discountPercent(
     product.priceCents,
     product.comparePriceCents,
@@ -43,11 +49,11 @@ export function ProductCard({ product }: { product: StoreProduct }) {
         </h3>
         <div className="mt-1 flex items-baseline gap-2">
           <span className="font-bold text-white">
-            {formatBRL(product.priceCents)}
+            {formatMoney(product.priceCents, currency)}
           </span>
           {product.comparePriceCents && (
             <span className="text-xs text-gray-500 line-through">
-              {formatBRL(product.comparePriceCents)}
+              {formatMoney(product.comparePriceCents, currency)}
             </span>
           )}
         </div>

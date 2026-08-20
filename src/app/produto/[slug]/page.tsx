@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/lib/products";
-import { formatBRL, discountPercent } from "@/lib/currency";
+import { formatMoney, discountPercent } from "@/lib/currency";
+import { getServerCurrency } from "@/lib/currency-server";
 import { CATEGORY_LABELS } from "@/lib/categories";
 import { AddToCart } from "@/components/add-to-cart";
 import { proxied } from "@/lib/img";
@@ -15,6 +16,7 @@ export default async function ProductPage({
   const product = await getProductBySlug(params.slug);
   if (!product || !product.active) notFound();
 
+  const currency = getServerCurrency();
   const desconto = discountPercent(
     product.priceCents,
     product.comparePriceCents,
@@ -58,11 +60,11 @@ export default async function ProductPage({
 
         <div className="mt-4 flex items-baseline gap-3">
           <span className="text-3xl font-bold text-white">
-            {formatBRL(product.priceCents)}
+            {formatMoney(product.priceCents, currency)}
           </span>
           {product.comparePriceCents && (
             <span className="text-lg text-gray-500 line-through">
-              {formatBRL(product.comparePriceCents)}
+              {formatMoney(product.comparePriceCents, currency)}
             </span>
           )}
           {desconto && (

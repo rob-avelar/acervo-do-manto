@@ -4,11 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart";
-import { formatBRL } from "@/lib/currency";
+import { formatMoney } from "@/lib/currency";
+import { useCurrency } from "@/lib/use-currency";
 import { createOrder } from "./actions";
 
 export default function CheckoutPage() {
   const { items, subtotalCents, clear } = useCart();
+  const currency = useCurrency();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -230,7 +232,7 @@ export default function CheckoutPage() {
                   {i.quantity}× {i.name} ({i.size})
                 </span>
                 <span className="whitespace-nowrap">
-                  {formatBRL(i.priceCents * i.quantity)}
+                  {formatMoney(i.priceCents * i.quantity, currency)}
                 </span>
               </div>
             ))}
@@ -238,17 +240,17 @@ export default function CheckoutPage() {
           <div className="border-t border-ink-600 pt-3 space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-400">Subtotal</span>
-              <span>{formatBRL(subtotalCents)}</span>
+              <span>{formatMoney(subtotalCents, currency)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Frete</span>
               <span>
-                {shippingCents === 0 ? "Grátis" : formatBRL(shippingCents)}
+                {shippingCents === 0 ? "Grátis" : formatMoney(shippingCents, currency)}
               </span>
             </div>
             <div className="flex justify-between font-bold text-base pt-1">
               <span>Total</span>
-              <span className="text-gold">{formatBRL(totalCents)}</span>
+              <span className="text-gold">{formatMoney(totalCents, currency)}</span>
             </div>
           </div>
 
