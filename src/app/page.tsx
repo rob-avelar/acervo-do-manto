@@ -184,9 +184,9 @@ function Hero() {
               🏆
             </span>
             <span className="text-sm">
-              <strong className="text-gold">+1.000 peças vendidas</strong>
+              <strong className="text-gold">Qualidade premium garantida</strong>
               <span className="block text-xs text-gray-300">
-                Qualidade garantida · Milhares de clientes
+                Camisas selecionadas · Envio para todo o Brasil
               </span>
             </span>
           </div>
