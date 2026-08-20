@@ -142,7 +142,7 @@ function Hero() {
       <Image
         src="/banner.png"
         alt="Acervo do Manto — camisas clássicas de futebol"
-        width={2438}
+        width={1950}
         height={810}
         priority
         className="absolute inset-0 w-full h-full object-cover"
