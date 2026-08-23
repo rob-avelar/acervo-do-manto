@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import {
   listProducts,
   getHighlights,
@@ -9,6 +8,7 @@ import { ProductCard } from "@/components/product-card";
 import { CATEGORY_LABELS, CATEGORY_ORDER } from "@/lib/categories";
 import { proxied } from "@/lib/img";
 import { getServerCurrency } from "@/lib/currency-server";
+import { HeroCarousel, type Slide } from "@/components/hero-carousel";
 import type { ProductCategory } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -35,13 +35,69 @@ export default async function HomePage({
     ? [[], []]
     : await Promise.all([getHighlights(8), getCategoryTiles()]);
 
+  const imgFor = (cat: ProductCategory) => {
+    const img = tiles.find((t) => t.category === cat)?.image;
+    return img ? proxied(img) : "/banner.png";
+  };
+
+  const slides: Slide[] = isBrowsing
+    ? []
+    : [
+        {
+          image: "/banner.png",
+          overline: "Camisas clássicas · Brasil & Europa",
+          title: "Vista a história do futebol",
+          highlight: "história",
+          subtitle:
+            "Milhares de camisas de clubes e seleções, retrôs e edições limitadas. Entrega para todo o Brasil.",
+          ctaHref: "/?categoria=NATIONAL_TEAM",
+          ctaLabel: "Ver seleções",
+        },
+        {
+          image: imgFor("RETRO" as ProductCategory),
+          overline: "Clássicos que marcaram época",
+          title: "Retrôs lendários",
+          highlight: "lendários",
+          subtitle:
+            "As camisas históricas dos maiores times e seleções do mundo.",
+          ctaHref: "/?categoria=RETRO",
+          ctaLabel: "Ver retrôs",
+        },
+        {
+          image: imgFor("LIMITED" as ProductCategory),
+          overline: "Copa 2026 & edições especiais",
+          title: "Edições limitadas",
+          highlight: "limitadas",
+          subtitle:
+            "Modelos especiais e comemorativos — enquanto durarem os estoques.",
+          ctaHref: "/?categoria=LIMITED",
+          ctaLabel: "Ver edições limitadas",
+        },
+      ];
+
   return (
     <div>
-      {!isBrowsing && <Hero />}
+      {!isBrowsing && <HeroCarousel slides={slides} />}
 
       <div className="mx-auto max-w-6xl px-4">
         {!isBrowsing && (
           <>
+            {/* Selo de qualidade */}
+            <div className="flex justify-center mt-8">
+              <div className="inline-flex items-center gap-3 rounded-full border border-gold/40 bg-ink-800 pl-2 pr-5 py-2">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-gold-light to-gold-dark text-ink text-lg">
+                  🏆
+                </span>
+                <span className="text-sm">
+                  <strong className="text-gold">
+                    Qualidade premium garantida
+                  </strong>
+                  <span className="block text-xs text-gray-300">
+                    Camisas selecionadas · Envio para todo o Brasil
+                  </span>
+                </span>
+              </div>
+            </div>
             <TrustBadges />
             <CategoryShowcase tiles={tiles} />
             {highlights.length > 0 && (
@@ -134,67 +190,6 @@ export default async function HomePage({
         </section>
       </div>
     </div>
-  );
-}
-
-function Hero() {
-  return (
-    <section className="relative border-b border-ink-600 overflow-hidden">
-      {/* Imagem de fundo */}
-      <Image
-        src="/banner.png"
-        alt="Acervo do Manto — camisas clássicas de futebol"
-        width={1950}
-        height={810}
-        priority
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-      {/* Gradiente para leitura do texto */}
-      <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/70 to-transparent" />
-      {/* Conteúdo */}
-      <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
-        <div className="max-w-xl">
-          <p className="text-gold font-semibold tracking-[0.2em] text-xs md:text-sm uppercase">
-            Camisas clássicas · Brasil &amp; Europa
-          </p>
-          <h1 className="mt-3 font-display text-4xl md:text-6xl font-bold leading-tight">
-            Vista a <span className="text-gradient-gold">história</span> do
-            futebol
-          </h1>
-          <p className="mt-4 text-gray-200 max-w-md">
-            Milhares de camisas de clubes e seleções, retrôs e edições
-            limitadas. Entrega para todo o Brasil.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/?categoria=NATIONAL_TEAM"
-              className="rounded-lg bg-gold text-ink px-6 py-3 font-semibold hover:bg-gold-light transition-colors"
-            >
-              Ver seleções
-            </Link>
-            <Link
-              href="/?categoria=RETRO"
-              className="rounded-lg border border-gold/50 text-gold px-6 py-3 font-semibold hover:bg-gold/10 transition-colors bg-ink/40 backdrop-blur-sm"
-            >
-              Ver retrôs
-            </Link>
-          </div>
-
-          {/* Selo de qualidade */}
-          <div className="mt-8 inline-flex items-center gap-3 rounded-full border border-gold/40 bg-ink/60 backdrop-blur-sm pl-2 pr-5 py-2">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-gold-light to-gold-dark text-ink text-lg">
-              🏆
-            </span>
-            <span className="text-sm">
-              <strong className="text-gold">Qualidade premium garantida</strong>
-              <span className="block text-xs text-gray-300">
-                Camisas selecionadas · Envio para todo o Brasil
-              </span>
-            </span>
-          </div>
-        </div>
-      </div>
-    </section>
   );
 }
 
