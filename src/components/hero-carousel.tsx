@@ -39,7 +39,7 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
 
   useEffect(() => {
     if (paused || count <= 1) return;
-    const t = setInterval(() => setIndex((i) => (i + 1) % count), 6000);
+    const t = setInterval(() => setIndex((i) => (i + 1) % count), 4000);
     return () => clearInterval(t);
   }, [paused, count]);
 
