@@ -130,11 +130,8 @@ export const dict = {
         "Camisas de futebol de clubes e seleções, retrôs e edições limitadas. Qualidade e entrega para todo o mundo.",
       shop: "Loja",
       help: "Ajuda",
-      helpItems: [
-        "Entrega para todo o mundo",
-        "Pagamento seguro",
-        "Frete grátis acima de R$300",
-      ],
+      helpItems: ["Entrega para todo o mundo", "Pagamento seguro"],
+      freeShipping: (amt: string) => `Frete grátis acima de ${amt}`,
       rights: "Todos os direitos reservados",
     },
     categories: {
@@ -271,11 +268,8 @@ export const dict = {
         "Club and national team football shirts, retros and limited editions. Quality and worldwide shipping.",
       shop: "Shop",
       help: "Help",
-      helpItems: [
-        "Worldwide shipping",
-        "Secure payment",
-        "Free shipping over R$300",
-      ],
+      helpItems: ["Worldwide shipping", "Secure payment"],
+      freeShipping: (amt: string) => `Free shipping over ${amt}`,
       rights: "All rights reserved",
     },
     categories: {

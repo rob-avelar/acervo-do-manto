@@ -8,6 +8,8 @@ import { CartBadge } from "@/components/cart-badge";
 import { SearchBar } from "@/components/search-bar";
 import { LangSwitcher } from "@/components/lang-switcher";
 import { getServerLang } from "@/lib/lang-server";
+import { getServerCurrency } from "@/lib/currency-server";
+import { formatMoney, FREE_SHIPPING_CENTS } from "@/lib/currency";
 import { dict } from "@/lib/i18n";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -29,7 +31,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const lang = getServerLang();
+  const currency = getServerCurrency();
   const t = dict[lang];
+  const freeShipAmt = formatMoney(FREE_SHIPPING_CENTS, currency);
 
   return (
     <html
@@ -120,6 +124,7 @@ export default function RootLayout({
                   {t.footer.helpItems.map((h) => (
                     <li key={h}>{h}</li>
                   ))}
+                  <li>{t.footer.freeShipping(freeShipAmt)}</li>
                 </ul>
               </div>
             </div>

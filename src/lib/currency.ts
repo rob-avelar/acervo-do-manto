@@ -6,6 +6,9 @@
 
 export type Currency = "BRL" | "USD" | "EUR";
 
+// Frete grátis acima deste subtotal (em centavos de BRL).
+export const FREE_SHIPPING_CENTS = 30000;
+
 // Taxas de conversão a partir do BRL. Ajuste conforme o câmbio / sua margem.
 export const CURRENCIES: Record<
   Currency,
