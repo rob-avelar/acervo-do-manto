@@ -23,15 +23,21 @@ export const CURRENCIES: Record<
  * Formata centavos de BRL na moeda escolhida (convertendo se necessário).
  * Aplica preço "psicológico" terminando em .90.
  */
-/** Valor numérico convertido (com arredondamento .90) na moeda escolhida. */
+/**
+ * Valor numérico convertido na moeda escolhida.
+ * BRL termina em .90 (ex.: 179,90); USD/EUR arredondam para inteiro (ex.: $40).
+ */
 export function amountFor(
   brlCents: number,
   currency: Currency = "BRL",
 ): number {
   const c = CURRENCIES[currency] ?? CURRENCIES.BRL;
   const raw = (brlCents / 100) * c.rate;
-  // arredonda para terminar em .90 (ex.: 30,58 -> 30,90; 179,90 -> 179,90)
-  return raw >= 1 ? Math.round(raw) - 0.1 : raw;
+  if (currency === "BRL") {
+    return raw >= 1 ? Math.round(raw) - 0.1 : raw;
+  }
+  // USD / EUR: número inteiro
+  return Math.max(raw >= 1 ? 1 : 0, Math.round(raw));
 }
 
 /** Valor em centavos da moeda de destino (para cobrar no Stripe). */
@@ -47,9 +53,12 @@ export function formatMoney(
   currency: Currency = "BRL",
 ): string {
   const c = CURRENCIES[currency] ?? CURRENCIES.BRL;
+  const digits = currency === "BRL" ? 2 : 0; // USD/EUR sem centavos
   return new Intl.NumberFormat(c.locale, {
     style: "currency",
     currency: c.code,
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
   }).format(amountFor(brlCents, currency));
 }
 
