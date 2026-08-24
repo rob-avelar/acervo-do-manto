@@ -15,6 +15,7 @@ export type CheckoutItem = {
 export type CheckoutInput = {
   customer: { name: string; email: string; phone: string; cpf: string };
   address: {
+    country: string;
     cep: string;
     street: string;
     number: string;
@@ -100,6 +101,7 @@ async function persistOrder(input: CheckoutInput) {
   const address = await prisma.address.create({
     data: {
       customerId: customer.id,
+      country: (input.address.country || "BR").trim().toUpperCase(),
       cep: input.address.cep.trim(),
       street: input.address.street.trim(),
       number: input.address.number.trim(),

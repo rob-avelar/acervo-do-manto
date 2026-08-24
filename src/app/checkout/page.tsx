@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart";
@@ -21,6 +21,7 @@ export default function CheckoutPage() {
     email: "",
     phone: "",
     cpf: "",
+    country: "",
     cep: "",
     street: "",
     number: "",
@@ -29,6 +30,18 @@ export default function CheckoutPage() {
     city: "",
     state: "",
   });
+
+  // País padrão conforme a moeda detectada (só se ainda não escolhido)
+  useEffect(() => {
+    setForm((f) => {
+      if (f.country) return f;
+      const def =
+        currency === "BRL" ? "BR" : currency === "EUR" ? "PT" : "US";
+      return { ...f, country: def };
+    });
+  }, [currency]);
+
+  const isBrazil = (form.country || "BR") === "BR";
 
   const shippingCents = subtotalCents >= 30000 ? 0 : 2490;
   const totalCents = subtotalCents + shippingCents;
@@ -73,6 +86,7 @@ export default function CheckoutPage() {
         cpf: form.cpf,
       },
       address: {
+        country: form.country || "BR",
         cep: form.cep,
         street: form.street,
         number: form.number,
@@ -157,76 +171,143 @@ export default function CheckoutPage() {
                 onChange={(e) => set("phone", e.target.value)}
               />
             </div>
-            <input
-              className={input}
-              placeholder="CPF"
-              value={form.cpf}
-              onChange={(e) => set("cpf", e.target.value)}
-            />
+            {isBrazil && (
+              <input
+                className={input}
+                placeholder="CPF"
+                value={form.cpf}
+                onChange={(e) => set("cpf", e.target.value)}
+              />
+            )}
           </fieldset>
 
           {/* Endereço */}
           <fieldset className="space-y-3">
-            <legend className="font-bold mb-2">Endereço de entrega</legend>
-            <div className="grid sm:grid-cols-2 gap-3">
-              <input
-                className={input}
-                placeholder="CEP"
-                required
-                value={form.cep}
-                onChange={(e) => set("cep", e.target.value)}
-                onBlur={(e) => lookupCep(e.target.value)}
-              />
-              <div className="text-xs text-gray-400 self-center">
-                {cepLoading ? "Buscando endereço..." : "Preenche automático"}
-              </div>
-            </div>
-            <input
+            <legend className="font-bold mb-2">
+              {isBrazil ? "Endereço de entrega" : "Shipping address"}
+            </legend>
+
+            {/* País */}
+            <select
               className={input}
-              placeholder="Rua / logradouro"
-              required
-              value={form.street}
-              onChange={(e) => set("street", e.target.value)}
-            />
-            <div className="grid sm:grid-cols-2 gap-3">
-              <input
-                className={input}
-                placeholder="Número"
-                required
-                value={form.number}
-                onChange={(e) => set("number", e.target.value)}
-              />
-              <input
-                className={input}
-                placeholder="Complemento (opcional)"
-                value={form.complement}
-                onChange={(e) => set("complement", e.target.value)}
-              />
-            </div>
-            <input
-              className={input}
-              placeholder="Bairro"
-              required
-              value={form.neighborhood}
-              onChange={(e) => set("neighborhood", e.target.value)}
-            />
-            <div className="grid sm:grid-cols-2 gap-3">
-              <input
-                className={input}
-                placeholder="Cidade"
-                required
-                value={form.city}
-                onChange={(e) => set("city", e.target.value)}
-              />
-              <input
-                className={input}
-                placeholder="UF"
-                required
-                maxLength={2}
-                value={form.state}
-                onChange={(e) => set("state", e.target.value.toUpperCase())}
-              />
-            </div>
+              value={form.country || "BR"}
+              onChange={(e) => set("country", e.target.value)}
+            >
+              <option value="BR">Brasil</option>
+              <option value="PT">Portugal</option>
+              <option value="ES">España</option>
+              <option value="FR">France</option>
+              <option value="DE">Deutschland</option>
+              <option value="IT">Italia</option>
+              <option value="GB">United Kingdom</option>
+              <option value="IE">Ireland</option>
+              <option value="NL">Netherlands</option>
+              <option value="US">United States</option>
+              <option value="CA">Canada</option>
+              <option value="OT">Outro / Other</option>
+            </select>
+
+            {isBrazil ? (
+              <>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <input
+                    className={input}
+                    placeholder="CEP"
+                    required
+                    value={form.cep}
+                    onChange={(e) => set("cep", e.target.value)}
+                    onBlur={(e) => lookupCep(e.target.value)}
+                  />
+                  <div className="text-xs text-gray-400 self-center">
+                    {cepLoading ? "Buscando endereço..." : "Preenche automático"}
+                  </div>
+                </div>
+                <input
+                  className={input}
+                  placeholder="Rua / logradouro"
+                  required
+                  value={form.street}
+                  onChange={(e) => set("street", e.target.value)}
+                />
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <input
+                    className={input}
+                    placeholder="Número"
+                    required
+                    value={form.number}
+                    onChange={(e) => set("number", e.target.value)}
+                  />
+                  <input
+                    className={input}
+                    placeholder="Complemento (opcional)"
+                    value={form.complement}
+                    onChange={(e) => set("complement", e.target.value)}
+                  />
+                </div>
+                <input
+                  className={input}
+                  placeholder="Bairro"
+                  required
+                  value={form.neighborhood}
+                  onChange={(e) => set("neighborhood", e.target.value)}
+                />
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <input
+                    className={input}
+                    placeholder="Cidade"
+                    required
+                    value={form.city}
+                    onChange={(e) => set("city", e.target.value)}
+                  />
+                  <input
+                    className={input}
+                    placeholder="UF"
+                    required
+                    maxLength={2}
+                    value={form.state}
+                    onChange={(e) => set("state", e.target.value.toUpperCase())}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <input
+                  className={input}
+                  placeholder="Address line (street, number)"
+                  required
+                  value={form.street}
+                  onChange={(e) => set("street", e.target.value)}
+                />
+                <input
+                  className={input}
+                  placeholder="Apartment / unit (optional)"
+                  value={form.complement}
+                  onChange={(e) => set("complement", e.target.value)}
+                />
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <input
+                    className={input}
+                    placeholder="City"
+                    required
+                    value={form.city}
+                    onChange={(e) => set("city", e.target.value)}
+                  />
+                  <input
+                    className={input}
+                    placeholder="State / Province"
+                    value={form.state}
+                    onChange={(e) => set("state", e.target.value)}
+                  />
+                </div>
+                <input
+                  className={input}
+                  placeholder="Postal code / ZIP"
+                  required
+                  value={form.cep}
+                  onChange={(e) => set("cep", e.target.value)}
+                />
+              </>
+            )}
           </fieldset>
 
           <p className="text-xs text-gray-400">

@@ -72,11 +72,14 @@ export default async function OrderPage({
       <div className="border border-ink-600 bg-ink-800 rounded-xl p-5 mt-4 text-sm">
         <h2 className="font-display text-lg font-bold mb-2">Entrega</h2>
         <p className="text-gray-300">
-          {order.address.street}, {order.address.number}
+          {order.address.street}
+          {order.address.number ? `, ${order.address.number}` : ""}
           {order.address.complement ? ` — ${order.address.complement}` : ""}
           <br />
-          {order.address.neighborhood} · {order.address.city}/
-          {order.address.state} · CEP {order.address.cep}
+          {order.address.neighborhood ? `${order.address.neighborhood} · ` : ""}
+          {order.address.city}
+          {order.address.state ? `/${order.address.state}` : ""} ·{" "}
+          {order.address.cep} · {order.address.country}
         </p>
       </div>
 

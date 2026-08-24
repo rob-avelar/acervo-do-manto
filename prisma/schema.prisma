@@ -63,13 +63,14 @@ model Address {
   id           String  @id @default(cuid())
   customer     Customer @relation(fields: [customerId], references: [id])
   customerId   String
-  cep          String // CEP brasileiro (00000-000)
+  country      String  @default("BR") // país (ISO-2: BR, PT, US, ...)
+  cep          String // CEP / código postal / ZIP
   street       String
   number       String
   complement   String?
-  neighborhood String // bairro
+  neighborhood String  @default("") // bairro (opcional fora do Brasil)
   city         String
-  state        String // UF (SP, RJ, ...)
+  state        String // UF / estado / província
   orders       Order[]
   createdAt    DateTime @default(now())
 

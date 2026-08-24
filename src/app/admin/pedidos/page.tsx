@@ -90,13 +90,17 @@ export default async function AdminOrdersPage() {
                     Endereço de entrega
                   </p>
                   <p className="text-gray-300">
-                    {o.address.street}, {o.address.number}
+                    {o.address.street}
+                    {o.address.number ? `, ${o.address.number}` : ""}
                     {o.address.complement ? ` — ${o.address.complement}` : ""}
                     <br />
-                    {o.address.neighborhood} · {o.address.city}/
-                    {o.address.state}
+                    {o.address.neighborhood
+                      ? `${o.address.neighborhood} · `
+                      : ""}
+                    {o.address.city}
+                    {o.address.state ? `/${o.address.state}` : ""}
                     <br />
-                    CEP {o.address.cep}
+                    {o.address.cep} · <strong>{o.address.country}</strong>
                   </p>
                 </div>
 
