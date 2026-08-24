@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart";
 import { formatMoney } from "@/lib/currency";
 import { useCurrency } from "@/lib/use-currency";
-import { createOrder } from "./actions";
+import { createOrder, createStripeCheckout } from "./actions";
 
 export default function CheckoutPage() {
   const { items, subtotalCents, clear } = useCart();
@@ -64,7 +64,8 @@ export default function CheckoutPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const result = await createOrder({
+
+    const payload = {
       customer: {
         name: form.name,
         email: form.email,
@@ -86,7 +87,22 @@ export default function CheckoutPage() {
         quantity: i.quantity,
         priceCents: i.priceCents,
       })),
-    });
+    };
+
+    // Fora do Brasil → pagamento online via Stripe. Brasil → fluxo manual.
+    if (currency === "USD" || currency === "EUR") {
+      const result = await createStripeCheckout(payload, currency);
+      if (result.ok) {
+        clear();
+        window.location.href = result.url; // vai para o checkout do Stripe
+        return;
+      }
+      setLoading(false);
+      setError(result.error);
+      return;
+    }
+
+    const result = await createOrder(payload);
     setLoading(false);
     if (result.ok) {
       clear();
@@ -214,8 +230,9 @@ export default function CheckoutPage() {
           </fieldset>
 
           <p className="text-xs text-gray-400">
-            💳 O pagamento (Pix, boleto ou cartão) será combinado após a
-            confirmação do pedido.
+            {currency === "USD" || currency === "EUR"
+              ? "💳 You'll be redirected to a secure card payment page (Stripe)."
+              : "💳 O pagamento (Pix, boleto ou cartão) será combinado após a confirmação do pedido."}
           </p>
         </div>
 
@@ -263,7 +280,11 @@ export default function CheckoutPage() {
             disabled={loading}
             className="mt-4 w-full rounded-lg bg-gold text-ink py-3 font-semibold hover:bg-gold-light transition-colors disabled:opacity-50"
           >
-            {loading ? "Enviando..." : "Confirmar pedido"}
+            {loading
+              ? "Processando..."
+              : currency === "USD" || currency === "EUR"
+                ? "Pagar com cartão"
+                : "Confirmar pedido"}
           </button>
         </div>
       </form>

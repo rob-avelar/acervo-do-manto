@@ -20,18 +20,34 @@ export const CURRENCIES: Record<
  * Formata centavos de BRL na moeda escolhida (convertendo se necessário).
  * Aplica preço "psicológico" terminando em .90.
  */
+/** Valor numérico convertido (com arredondamento .90) na moeda escolhida. */
+export function amountFor(
+  brlCents: number,
+  currency: Currency = "BRL",
+): number {
+  const c = CURRENCIES[currency] ?? CURRENCIES.BRL;
+  const raw = (brlCents / 100) * c.rate;
+  // arredonda para terminar em .90 (ex.: 30,58 -> 30,90; 179,90 -> 179,90)
+  return raw >= 1 ? Math.round(raw) - 0.1 : raw;
+}
+
+/** Valor em centavos da moeda de destino (para cobrar no Stripe). */
+export function targetCents(
+  brlCents: number,
+  currency: Currency = "BRL",
+): number {
+  return Math.round(amountFor(brlCents, currency) * 100);
+}
+
 export function formatMoney(
   brlCents: number,
   currency: Currency = "BRL",
 ): string {
   const c = CURRENCIES[currency] ?? CURRENCIES.BRL;
-  const raw = (brlCents / 100) * c.rate;
-  // arredonda para terminar em .90 (ex.: 30,58 -> 30,90; 179,90 -> 179,90)
-  const nice = raw >= 1 ? Math.round(raw) - 0.1 : raw;
   return new Intl.NumberFormat(c.locale, {
     style: "currency",
     currency: c.code,
-  }).format(nice);
+  }).format(amountFor(brlCents, currency));
 }
 
 /** Formata centavos de BRL como "R$ 1.234,56" (compatibilidade). */

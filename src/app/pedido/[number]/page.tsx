@@ -33,8 +33,9 @@ export default async function OrderPage({
           <strong className="text-gold">{order.number}</strong>
         </p>
         <p className="text-gray-400 text-sm mt-2">
-          Enviamos os detalhes para {order.customer.email}. Em breve entramos em
-          contato para combinar o pagamento (Pix, boleto ou cartão).
+          {order.status === "PAID"
+            ? `Pagamento confirmado! Enviamos os detalhes para ${order.customer.email} e já vamos preparar seu envio.`
+            : `Enviamos os detalhes para ${order.customer.email}. Assim que o pagamento for confirmado, preparamos seu envio.`}
         </p>
       </div>
 
