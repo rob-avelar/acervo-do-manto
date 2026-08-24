@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(body, sig ?? "", secret);
+    event = getStripe().webhooks.constructEvent(body, sig ?? "", secret);
   } catch (err) {
     console.error("Assinatura inválida do webhook:", err);
     return NextResponse.json({ error: "assinatura inválida" }, { status: 400 });

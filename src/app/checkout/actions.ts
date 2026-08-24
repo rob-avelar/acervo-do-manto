@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { stripe, hasStripe } from "@/lib/stripe";
+import { getStripe, hasStripe } from "@/lib/stripe";
 import { targetCents, type Currency } from "@/lib/currency";
 
 export type CheckoutItem = {
@@ -189,7 +189,7 @@ export async function createStripeCheckout(
       });
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       mode: "payment",
       line_items,
       customer_email: customer.email,
