@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { useCart } from "@/lib/cart";
 
-export function CartBadge() {
+export function CartBadge({ label = "Carrinho" }: { label?: string }) {
   const { count } = useCart();
   return (
     <Link
       href="/carrinho"
       className="relative text-gray-300 hover:text-gold transition-colors"
     >
-      Carrinho
+      {label}
       {count > 0 && (
         <span className="absolute -top-2 -right-4 rounded-full bg-gold text-ink text-xs font-bold min-w-[1.25rem] h-5 px-1 inline-flex items-center justify-center">
           {count}

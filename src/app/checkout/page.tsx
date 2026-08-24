@@ -6,11 +6,15 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart";
 import { formatMoney } from "@/lib/currency";
 import { useCurrency } from "@/lib/use-currency";
+import { useLang } from "@/lib/use-lang";
+import { dict } from "@/lib/i18n";
 import { createOrder, createStripeCheckout } from "./actions";
 
 export default function CheckoutPage() {
   const { items, subtotalCents, clear } = useCart();
   const currency = useCurrency();
+  const lang = useLang();
+  const t = dict[lang].checkout;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -129,9 +133,9 @@ export default function CheckoutPage() {
   if (items.length === 0) {
     return (
       <div className="mx-auto max-w-6xl px-4 text-center py-24">
-        <h1 className="font-display text-3xl font-bold mb-2">Carrinho vazio</h1>
+        <h1 className="font-display text-3xl font-bold mb-2">{t.empty}</h1>
         <Link href="/" className="text-gold underline">
-          Ver catálogo
+          {dict[lang].cart.seeCatalog}
         </Link>
       </div>
     );
@@ -142,15 +146,15 @@ export default function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="font-display text-3xl font-bold mb-6">Finalizar pedido</h1>
+      <h1 className="font-display text-3xl font-bold mb-6">{t.title}</h1>
       <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           {/* Dados do cliente */}
           <fieldset className="space-y-3">
-            <legend className="font-bold mb-2">Seus dados</legend>
+            <legend className="font-bold mb-2">{t.yourData}</legend>
             <input
               className={input}
-              placeholder="Nome completo"
+              placeholder={t.fullName}
               required
               value={form.name}
               onChange={(e) => set("name", e.target.value)}
@@ -159,14 +163,14 @@ export default function CheckoutPage() {
               <input
                 className={input}
                 type="email"
-                placeholder="E-mail"
+                placeholder={t.email}
                 required
                 value={form.email}
                 onChange={(e) => set("email", e.target.value)}
               />
               <input
                 className={input}
-                placeholder="Telefone / WhatsApp"
+                placeholder={t.phone}
                 value={form.phone}
                 onChange={(e) => set("phone", e.target.value)}
               />
@@ -183,9 +187,7 @@ export default function CheckoutPage() {
 
           {/* Endereço */}
           <fieldset className="space-y-3">
-            <legend className="font-bold mb-2">
-              {isBrazil ? "Endereço de entrega" : "Shipping address"}
-            </legend>
+            <legend className="font-bold mb-2">{t.addressTitle}</legend>
 
             {/* País */}
             <select
@@ -212,19 +214,19 @@ export default function CheckoutPage() {
                 <div className="grid sm:grid-cols-2 gap-3">
                   <input
                     className={input}
-                    placeholder="CEP"
+                    placeholder={t.postal}
                     required
                     value={form.cep}
                     onChange={(e) => set("cep", e.target.value)}
                     onBlur={(e) => lookupCep(e.target.value)}
                   />
                   <div className="text-xs text-gray-400 self-center">
-                    {cepLoading ? "Buscando endereço..." : "Preenche automático"}
+                    {cepLoading ? t.searching : t.autofill}
                   </div>
                 </div>
                 <input
                   className={input}
-                  placeholder="Rua / logradouro"
+                  placeholder={t.street}
                   required
                   value={form.street}
                   onChange={(e) => set("street", e.target.value)}
@@ -232,21 +234,21 @@ export default function CheckoutPage() {
                 <div className="grid sm:grid-cols-2 gap-3">
                   <input
                     className={input}
-                    placeholder="Número"
+                    placeholder={t.number}
                     required
                     value={form.number}
                     onChange={(e) => set("number", e.target.value)}
                   />
                   <input
                     className={input}
-                    placeholder="Complemento (opcional)"
+                    placeholder={t.complement}
                     value={form.complement}
                     onChange={(e) => set("complement", e.target.value)}
                   />
                 </div>
                 <input
                   className={input}
-                  placeholder="Bairro"
+                  placeholder={t.neighborhood}
                   required
                   value={form.neighborhood}
                   onChange={(e) => set("neighborhood", e.target.value)}
@@ -254,7 +256,7 @@ export default function CheckoutPage() {
                 <div className="grid sm:grid-cols-2 gap-3">
                   <input
                     className={input}
-                    placeholder="Cidade"
+                    placeholder={t.city}
                     required
                     value={form.city}
                     onChange={(e) => set("city", e.target.value)}
@@ -273,35 +275,35 @@ export default function CheckoutPage() {
               <>
                 <input
                   className={input}
-                  placeholder="Address line (street, number)"
+                  placeholder={t.addressLine}
                   required
                   value={form.street}
                   onChange={(e) => set("street", e.target.value)}
                 />
                 <input
                   className={input}
-                  placeholder="Apartment / unit (optional)"
+                  placeholder={t.apt}
                   value={form.complement}
                   onChange={(e) => set("complement", e.target.value)}
                 />
                 <div className="grid sm:grid-cols-2 gap-3">
                   <input
                     className={input}
-                    placeholder="City"
+                    placeholder={t.city}
                     required
                     value={form.city}
                     onChange={(e) => set("city", e.target.value)}
                   />
                   <input
                     className={input}
-                    placeholder="State / Province"
+                    placeholder={t.state}
                     value={form.state}
                     onChange={(e) => set("state", e.target.value)}
                   />
                 </div>
                 <input
                   className={input}
-                  placeholder="Postal code / ZIP"
+                  placeholder={t.postal}
                   required
                   value={form.cep}
                   onChange={(e) => set("cep", e.target.value)}
@@ -312,14 +314,14 @@ export default function CheckoutPage() {
 
           <p className="text-xs text-gray-400">
             {currency === "USD" || currency === "EUR"
-              ? "💳 You'll be redirected to a secure card payment page (Stripe)."
-              : "💳 O pagamento (Pix, boleto ou cartão) será combinado após a confirmação do pedido."}
+              ? t.payNoteCard
+              : t.payNote}
           </p>
         </div>
 
         {/* Resumo */}
         <div className="border border-ink-600 bg-ink-800 rounded-xl p-5 h-fit">
-          <h2 className="font-display text-xl font-bold mb-4">Seu pedido</h2>
+          <h2 className="font-display text-xl font-bold mb-4">{t.yourOrder}</h2>
           <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
             {items.map((i) => (
               <div
@@ -337,17 +339,19 @@ export default function CheckoutPage() {
           </div>
           <div className="border-t border-ink-600 pt-3 space-y-1 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-400">Subtotal</span>
+              <span className="text-gray-400">{dict[lang].cart.subtotal}</span>
               <span>{formatMoney(subtotalCents, currency)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-400">Frete</span>
+              <span className="text-gray-400">{dict[lang].cart.shipping}</span>
               <span>
-                {shippingCents === 0 ? "Grátis" : formatMoney(shippingCents, currency)}
+                {shippingCents === 0
+                  ? t.free
+                  : formatMoney(shippingCents, currency)}
               </span>
             </div>
             <div className="flex justify-between font-bold text-base pt-1">
-              <span>Total</span>
+              <span>{t.total}</span>
               <span className="text-gold">{formatMoney(totalCents, currency)}</span>
             </div>
           </div>
@@ -362,10 +366,10 @@ export default function CheckoutPage() {
             className="mt-4 w-full rounded-lg bg-gold text-ink py-3 font-semibold hover:bg-gold-light transition-colors disabled:opacity-50"
           >
             {loading
-              ? "Processando..."
+              ? t.processing
               : currency === "USD" || currency === "EUR"
-                ? "Pagar com cartão"
-                : "Confirmar pedido"}
+                ? t.payCard
+                : t.confirm}
           </button>
         </div>
       </form>

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { currencyForCountry } from "@/lib/geo";
+import { langForCountry } from "@/lib/i18n";
 
 // Detecta o país do visitante (header de geolocalização da Vercel) e grava
 // a moeda de exibição num cookie que o cliente também consegue ler.
@@ -27,6 +28,14 @@ export function middleware(req: NextRequest) {
     maxAge: 60 * 60 * 24 * 30,
     sameSite: "lax",
   });
+  // Idioma padrão pelo país — só se o usuário ainda não escolheu.
+  if (!req.cookies.get("lang")) {
+    res.cookies.set("lang", langForCountry(country), {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+    });
+  }
   return res;
 }
 

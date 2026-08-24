@@ -1,15 +1,19 @@
 import Link from "next/link";
 import type { StoreProduct } from "@prisma/client";
 import { formatMoney, discountPercent, type Currency } from "@/lib/currency";
+import type { Lang } from "@/lib/i18n";
 import { proxied } from "@/lib/img";
 
 export function ProductCard({
   product,
   currency = "BRL",
+  lang = "pt",
 }: {
   product: StoreProduct;
   currency?: Currency;
+  lang?: Lang;
 }) {
+  const name = lang === "en" ? product.nameEn : product.namePt;
   const desconto = discountPercent(
     product.priceCents,
     product.comparePriceCents,
@@ -25,7 +29,7 @@ export function ProductCard({
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={proxied(product.images[0])}
-            alt={product.namePt}
+            alt={name}
             loading="lazy"
             decoding="async"
             width={400}
@@ -45,7 +49,7 @@ export function ProductCard({
           {product.teamName}
         </p>
         <h3 className="text-sm font-medium line-clamp-2 min-h-[2.5rem] mt-0.5 text-gray-100">
-          {product.namePt}
+          {name}
         </h3>
         <div className="mt-1 flex items-baseline gap-2">
           <span className="font-bold text-white">

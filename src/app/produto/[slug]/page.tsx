@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/lib/products";
 import { formatMoney, discountPercent } from "@/lib/currency";
 import { getServerCurrency } from "@/lib/currency-server";
-import { CATEGORY_LABELS } from "@/lib/categories";
+import { getServerLang } from "@/lib/lang-server";
+import { dict } from "@/lib/i18n";
 import { AddToCart } from "@/components/add-to-cart";
 import { proxied } from "@/lib/img";
 
@@ -17,6 +18,9 @@ export default async function ProductPage({
   if (!product || !product.active) notFound();
 
   const currency = getServerCurrency();
+  const lang = getServerLang();
+  const t = dict[lang];
+  const name = lang === "en" ? product.nameEn : product.namePt;
   const desconto = discountPercent(
     product.priceCents,
     product.comparePriceCents,
@@ -36,7 +40,7 @@ export default async function ProductPage({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={proxied(img)}
-              alt={`${product.namePt} — foto ${i + 1}`}
+              alt={`${name} — ${i + 1}`}
               loading="lazy"
               referrerPolicy="no-referrer"
               className="absolute inset-0 w-full h-full object-cover"
@@ -50,11 +54,9 @@ export default async function ProductPage({
         <p className="text-sm text-gold/80 uppercase tracking-wide">
           {product.teamName}
         </p>
-        <h1 className="font-display text-3xl font-bold mt-1">
-          {product.namePt}
-        </h1>
+        <h1 className="font-display text-3xl font-bold mt-1">{name}</h1>
         <p className="mt-1 text-sm text-gray-400">
-          {CATEGORY_LABELS[product.category]}
+          {t.categories[product.category]}
           {product.season ? ` · ${product.season}` : ""}
         </p>
 
@@ -77,16 +79,23 @@ export default async function ProductPage({
         <AddToCart
           productId={product.id}
           slug={product.slug}
-          name={product.namePt}
+          name={name}
           image={product.images[0] ?? ""}
           priceCents={product.priceCents}
           sizes={product.sizes}
+          labels={{
+            size: t.product.size,
+            selectSize: t.product.selectSize,
+            add: t.product.add,
+            added: t.product.added,
+            buyNow: t.product.buyNow,
+          }}
         />
 
         <div className="mt-6 rounded-xl border border-ink-600 bg-ink-800 p-4 text-sm text-gray-300 space-y-1">
-          <p>📦 Entrega para todo o Brasil (frete calculado por CEP)</p>
-          <p>💳 Pix, boleto e cartão</p>
-          <p>🔁 Troca fácil por tamanho</p>
+          <p>{t.product.infoDelivery}</p>
+          <p>{t.product.infoPay}</p>
+          <p>{t.product.infoExchange}</p>
         </div>
       </div>
     </div>

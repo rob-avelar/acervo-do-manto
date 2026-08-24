@@ -4,26 +4,25 @@ import Link from "next/link";
 import { useCart } from "@/lib/cart";
 import { formatMoney } from "@/lib/currency";
 import { useCurrency } from "@/lib/use-currency";
+import { useLang } from "@/lib/use-lang";
+import { dict } from "@/lib/i18n";
 import { proxied } from "@/lib/img";
 
 export default function CartPage() {
   const { items, subtotalCents, setQuantity, removeItem } = useCart();
   const currency = useCurrency();
+  const t = dict[useLang()].cart;
 
   if (items.length === 0) {
     return (
       <div className="mx-auto max-w-6xl px-4 text-center py-24">
-        <h1 className="font-display text-3xl font-bold mb-2">
-          Seu carrinho está vazio
-        </h1>
-        <p className="text-gray-400 mb-6">
-          Adicione camisas pra começar seu pedido.
-        </p>
+        <h1 className="font-display text-3xl font-bold mb-2">{t.empty}</h1>
+        <p className="text-gray-400 mb-6">{t.emptySub}</p>
         <Link
           href="/"
           className="inline-block rounded-lg bg-gold text-ink px-6 py-3 font-semibold hover:bg-gold-light"
         >
-          Ver catálogo
+          {t.seeCatalog}
         </Link>
       </div>
     );
@@ -31,7 +30,7 @@ export default function CartPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="font-display text-3xl font-bold mb-6">Carrinho</h1>
+      <h1 className="font-display text-3xl font-bold mb-6">{t.title}</h1>
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Itens */}
@@ -61,7 +60,7 @@ export default function CartPage() {
                   {item.name}
                 </Link>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  Tamanho: {item.size}
+                  {t.size}: {item.size}
                 </p>
                 <div className="mt-2 flex items-center gap-3">
                   <div className="flex items-center border border-ink-600 rounded-lg">
@@ -90,7 +89,7 @@ export default function CartPage() {
                     className="text-xs text-gray-400 hover:text-red-500"
                     onClick={() => removeItem(item.slug, item.size)}
                   >
-                    Remover
+                    {t.remove}
                   </button>
                 </div>
               </div>
@@ -103,26 +102,26 @@ export default function CartPage() {
 
         {/* Resumo */}
         <div className="border border-ink-600 bg-ink-800 rounded-xl p-5 h-fit">
-          <h2 className="font-display text-xl font-bold mb-4">Resumo</h2>
+          <h2 className="font-display text-xl font-bold mb-4">{t.summary}</h2>
           <div className="flex justify-between text-sm mb-2">
-            <span className="text-gray-400">Subtotal</span>
+            <span className="text-gray-400">{t.subtotal}</span>
             <span>{formatMoney(subtotalCents, currency)}</span>
           </div>
           <div className="flex justify-between text-sm mb-4">
-            <span className="text-gray-400">Frete</span>
-            <span className="text-gray-500">calculado no checkout</span>
+            <span className="text-gray-400">{t.shipping}</span>
+            <span className="text-gray-500">{t.shippingCheckout}</span>
           </div>
           <Link
             href="/checkout"
             className="block text-center rounded-lg bg-gold text-ink py-3 font-semibold hover:bg-gold-light transition-colors"
           >
-            Finalizar pedido
+            {t.checkout}
           </Link>
           <Link
             href="/"
             className="block text-center text-sm text-gray-400 mt-3 hover:text-gold"
           >
-            Continuar comprando
+            {t.keepShopping}
           </Link>
         </div>
       </div>

@@ -11,6 +11,13 @@ type Props = {
   image: string;
   priceCents: number;
   sizes: string[];
+  labels: {
+    size: string;
+    selectSize: string;
+    add: string;
+    added: string;
+    buyNow: string;
+  };
 };
 
 export function AddToCart({
@@ -20,6 +27,7 @@ export function AddToCart({
   image,
   priceCents,
   sizes,
+  labels,
 }: Props) {
   const { addItem } = useCart();
   const router = useRouter();
@@ -38,10 +46,8 @@ export function AddToCart({
     <div>
       <div className="mt-6">
         <p className="text-sm font-medium mb-2 text-gray-200">
-          Tamanho{" "}
-          {!size && (
-            <span className="text-gold">— selecione um tamanho</span>
-          )}
+          {labels.size}{" "}
+          {!size && <span className="text-gold">{labels.selectSize}</span>}
         </p>
         <div className="flex flex-wrap gap-2">
           {sizes.map((s) => (
@@ -68,7 +74,7 @@ export function AddToCart({
           onClick={() => handleAdd(false)}
           className="w-full rounded-lg bg-gold text-ink py-3 font-semibold hover:bg-gold-light transition-colors disabled:opacity-40"
         >
-          {added ? "Adicionado ✓" : "Adicionar ao carrinho"}
+          {added ? labels.added : labels.add}
         </button>
         <button
           type="button"
@@ -76,7 +82,7 @@ export function AddToCart({
           onClick={() => handleAdd(true)}
           className="w-full rounded-lg border border-gold/50 text-gold py-3 font-semibold hover:bg-gold/10 transition-colors disabled:opacity-40"
         >
-          Comprar agora
+          {labels.buyNow}
         </button>
       </div>
     </div>

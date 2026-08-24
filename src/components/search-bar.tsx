@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export function SearchBar() {
+export function SearchBar({ placeholder }: { placeholder?: string }) {
   const router = useRouter();
   const params = useSearchParams();
   const busca = params.get("busca") ?? "";
@@ -26,7 +26,7 @@ export function SearchBar() {
         type="search"
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Buscar por time ou seleção..."
+        placeholder={placeholder ?? "Buscar por time ou seleção..."}
         className="w-full rounded-full border border-white/30 bg-white/10 text-white placeholder-white/60 pl-10 pr-4 py-2 text-sm focus:outline-none focus:bg-white focus:text-gray-900 focus:placeholder-gray-400"
         aria-label="Buscar camisas"
       />

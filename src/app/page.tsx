@@ -5,9 +5,11 @@ import {
   getCategoryTiles,
 } from "@/lib/products";
 import { ProductCard } from "@/components/product-card";
-import { CATEGORY_LABELS, CATEGORY_ORDER } from "@/lib/categories";
+import { CATEGORY_ORDER } from "@/lib/categories";
 import { proxied } from "@/lib/img";
 import { getServerCurrency } from "@/lib/currency-server";
+import { getServerLang } from "@/lib/lang-server";
+import { dict, type Lang } from "@/lib/i18n";
 import { HeroCarousel, type Slide } from "@/components/hero-carousel";
 import type { ProductCategory } from "@prisma/client";
 
@@ -23,6 +25,9 @@ export default async function HomePage({
   const page = Number(searchParams.pagina ?? "1");
   const isBrowsing = Boolean(category || search || page > 1);
   const currency = getServerCurrency();
+  const lang = getServerLang();
+  const t = dict[lang];
+  const catLabel = (c: ProductCategory) => t.categories[c];
 
   const { items, total, pages } = await listProducts({
     category,
@@ -36,43 +41,30 @@ export default async function HomePage({
     : await Promise.all([getHighlights(8), getCategoryTiles()]);
 
   const imgFor = (cat: ProductCategory) => {
-    const img = tiles.find((t) => t.category === cat)?.image;
+    const img = tiles.find((x) => x.category === cat)?.image;
     return img ? proxied(img) : "/banner.png";
   };
+
+  const mkSlide = (
+    image: string,
+    s: { overline: string; title: string; highlight: string; subtitle: string; cta: string },
+    href: string,
+  ): Slide => ({
+    image,
+    overline: s.overline,
+    title: s.title,
+    highlight: s.highlight,
+    subtitle: s.subtitle,
+    ctaHref: href,
+    ctaLabel: s.cta,
+  });
 
   const slides: Slide[] = isBrowsing
     ? []
     : [
-        {
-          image: "/banner.png",
-          overline: "Camisas clássicas · Brasil & Europa",
-          title: "Vista a história do futebol",
-          highlight: "história",
-          subtitle:
-            "Milhares de camisas de clubes e seleções, retrôs e edições limitadas. Entrega para todo o Brasil.",
-          ctaHref: "/?categoria=NATIONAL_TEAM",
-          ctaLabel: "Ver seleções",
-        },
-        {
-          image: imgFor("RETRO" as ProductCategory),
-          overline: "Clássicos que marcaram época",
-          title: "Retrôs lendários",
-          highlight: "lendários",
-          subtitle:
-            "As camisas históricas dos maiores times e seleções do mundo.",
-          ctaHref: "/?categoria=RETRO",
-          ctaLabel: "Ver retrôs",
-        },
-        {
-          image: imgFor("LIMITED" as ProductCategory),
-          overline: "Copa 2026 & edições especiais",
-          title: "Edições limitadas",
-          highlight: "limitadas",
-          subtitle:
-            "Modelos especiais e comemorativos — enquanto durarem os estoques.",
-          ctaHref: "/?categoria=LIMITED",
-          ctaLabel: "Ver edições limitadas",
-        },
+        mkSlide("/banner.png", t.hero.slide1, "/?categoria=NATIONAL_TEAM"),
+        mkSlide(imgFor("RETRO" as ProductCategory), t.hero.slide2, "/?categoria=RETRO"),
+        mkSlide(imgFor("LIMITED" as ProductCategory), t.hero.slide3, "/?categoria=LIMITED"),
       ];
 
   return (
@@ -89,26 +81,29 @@ export default async function HomePage({
                   🏆
                 </span>
                 <span className="text-sm">
-                  <strong className="text-gold">
-                    Qualidade premium garantida
-                  </strong>
+                  <strong className="text-gold">{t.seal.title}</strong>
                   <span className="block text-xs text-gray-300">
-                    Camisas selecionadas · Envio para todo o Brasil
+                    {t.seal.sub}
                   </span>
                 </span>
               </div>
             </div>
-            <TrustBadges />
-            <CategoryShowcase tiles={tiles} />
+            <TrustBadges t={t} />
+            <CategoryShowcase tiles={tiles} t={t} />
             {highlights.length > 0 && (
               <section className="mt-14">
                 <SectionTitle
-                  overline="Seleção da casa"
-                  title="Destaques"
+                  overline={t.highlightsOverline}
+                  title={t.highlights}
                 />
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                   {highlights.map((p) => (
-                    <ProductCard key={p.id} product={p} currency={currency} />
+                    <ProductCard
+                      key={p.id}
+                      product={p}
+                      currency={currency}
+                      lang={lang}
+                    />
                   ))}
                 </div>
               </section>
@@ -121,18 +116,18 @@ export default async function HomePage({
           <div className="mb-6">
             <h2 className="font-display text-3xl font-bold">
               {search
-                ? `Resultados para “${search}”`
+                ? t.catalog.results(search)
                 : category
-                  ? CATEGORY_LABELS[category]
-                  : "Todas as camisas"}
+                  ? catLabel(category)
+                  : t.catalog.all}
             </h2>
             <p className="text-gray-400 mt-1 text-sm">
-              {total} {total === 1 ? "produto" : "produtos"}
+              {t.catalog.count(total)}
               {(search || category) && (
                 <>
                   {" · "}
                   <Link href="/" className="text-gold hover:underline">
-                    limpar
+                    {t.catalog.clear}
                   </Link>
                 </>
               )}
@@ -141,11 +136,15 @@ export default async function HomePage({
 
           {/* Filtros por categoria */}
           <div className="mb-8 flex flex-wrap gap-2">
-            <FilterChip label="Todos" href="/" active={!category && !search} />
+            <FilterChip
+              label={t.catalog.all_filter}
+              href="/"
+              active={!category && !search}
+            />
             {CATEGORY_ORDER.map((cat) => (
               <FilterChip
                 key={cat}
-                label={CATEGORY_LABELS[cat]}
+                label={catLabel(cat)}
                 href={`/?categoria=${cat}`}
                 active={category === cat}
               />
@@ -153,13 +152,16 @@ export default async function HomePage({
           </div>
 
           {items.length === 0 ? (
-            <p className="text-gray-400 py-12 text-center">
-              Nenhum produto encontrado.
-            </p>
+            <p className="text-gray-400 py-12 text-center">{t.catalog.empty}</p>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {items.map((p) => (
-                <ProductCard key={p.id} product={p} currency={currency} />
+                <ProductCard
+                  key={p.id}
+                  product={p}
+                  currency={currency}
+                  lang={lang}
+                />
               ))}
             </div>
           )}
@@ -171,18 +173,18 @@ export default async function HomePage({
                   className="px-4 py-2 border border-ink-600 rounded-lg hover:border-gold"
                   href={buildHref(searchParams, page - 1)}
                 >
-                  Anterior
+                  {t.catalog.prev}
                 </Link>
               )}
               <span className="px-4 py-2 text-gray-400">
-                Página {page} de {pages}
+                {t.catalog.page(page, pages)}
               </span>
               {page < pages && (
                 <Link
                   className="px-4 py-2 border border-ink-600 rounded-lg hover:border-gold"
                   href={buildHref(searchParams, page + 1)}
                 >
-                  Próxima
+                  {t.catalog.next}
                 </Link>
               )}
             </div>
@@ -193,24 +195,26 @@ export default async function HomePage({
   );
 }
 
-function TrustBadges() {
+type T = (typeof dict)[Lang];
+
+function TrustBadges({ t }: { t: T }) {
   const badges = [
-    { icon: "🚚", title: "Entrega Brasil", sub: "Enviamos para todo o país" },
-    { icon: "💳", title: "Pix, boleto e cartão", sub: "Pague como preferir" },
-    { icon: "🔒", title: "Compra segura", sub: "Seus dados protegidos" },
-    { icon: "🔁", title: "Troca fácil", sub: "Tamanho errado? A gente troca" },
+    { icon: "🚚", ...t.trust.shipping },
+    { icon: "💳", ...t.trust.pay },
+    { icon: "🔒", ...t.trust.secure },
+    { icon: "🔁", ...t.trust.exchange },
   ];
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8">
       {badges.map((b) => (
         <div
-          key={b.title}
+          key={b.t}
           className="flex items-center gap-3 rounded-xl border border-ink-600 bg-ink-800 p-4"
         >
           <span className="text-2xl">{b.icon}</span>
           <div>
-            <p className="text-sm font-semibold">{b.title}</p>
-            <p className="text-xs text-gray-400">{b.sub}</p>
+            <p className="text-sm font-semibold">{b.t}</p>
+            <p className="text-xs text-gray-400">{b.s}</p>
           </div>
         </div>
       ))}
@@ -220,24 +224,26 @@ function TrustBadges() {
 
 function CategoryShowcase({
   tiles,
+  t,
 }: {
   tiles: { category: ProductCategory; image: string | null }[];
+  t: T;
 }) {
   return (
     <section className="mt-14">
-      <SectionTitle overline="Navegue por" title="Categorias" />
+      <SectionTitle overline={t.categoriesOverline} title={t.categoriesTitle} />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-        {tiles.map((t) => (
+        {tiles.map((tile) => (
           <Link
-            key={t.category}
-            href={`/?categoria=${t.category}`}
+            key={tile.category}
+            href={`/?categoria=${tile.category}`}
             className="group relative aspect-[4/5] overflow-hidden rounded-xl border border-ink-600 bg-ink-800"
           >
-            {t.image && (
+            {tile.image && (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
-                src={proxied(t.image)}
-                alt={CATEGORY_LABELS[t.category]}
+                src={proxied(tile.image)}
+                alt={t.categories[tile.category]}
                 loading="lazy"
                 referrerPolicy="no-referrer"
                 className="absolute inset-0 h-full w-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-300"
@@ -246,10 +252,10 @@ function CategoryShowcase({
             <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" />
             <div className="absolute bottom-0 left-0 p-4">
               <span className="font-display text-xl font-bold">
-                {CATEGORY_LABELS[t.category]}
+                {t.categories[tile.category]}
               </span>
               <span className="block text-gold text-xs mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                Ver camisas →
+                {t.seeMore}
               </span>
             </div>
           </Link>

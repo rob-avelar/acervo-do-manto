@@ -6,6 +6,9 @@ import "./globals.css";
 import { CartProvider } from "@/lib/cart";
 import { CartBadge } from "@/components/cart-badge";
 import { SearchBar } from "@/components/search-bar";
+import { LangSwitcher } from "@/components/lang-switcher";
+import { getServerLang } from "@/lib/lang-server";
+import { dict } from "@/lib/i18n";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const oswald = Oswald({
@@ -15,9 +18,9 @@ const oswald = Oswald({
 });
 
 export const metadata: Metadata = {
-  title: "Acervo do Manto — Camisas de Futebol",
+  title: "Acervo do Manto — Football Shirts",
   description:
-    "Camisas de futebol de clubes e seleções, retrôs e edições limitadas. Entrega para todo o Brasil.",
+    "Club and national team football shirts, retros and limited editions. Worldwide shipping.",
 };
 
 export default function RootLayout({
@@ -25,14 +28,19 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const lang = getServerLang();
+  const t = dict[lang];
+
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${oswald.variable}`}>
+    <html
+      lang={lang === "pt" ? "pt-BR" : "en"}
+      className={`${inter.variable} ${oswald.variable}`}
+    >
       <body className="min-h-screen flex flex-col bg-ink text-white font-sans">
         <CartProvider>
           {/* Barra de anúncio */}
           <div className="bg-gold text-ink text-center text-xs md:text-sm font-semibold py-2 px-4">
-            🚚 Frete grátis acima de R$300 · 💳 Pix, boleto e cartão · Entrega
-            para todo o Brasil
+            {t.announce}
           </div>
 
           {/* Header */}
@@ -48,17 +56,18 @@ export default function RootLayout({
               </Link>
               <div className="order-3 w-full md:order-none md:flex-1 md:w-auto">
                 <Suspense fallback={null}>
-                  <SearchBar />
+                  <SearchBar placeholder={t.search} />
                 </Suspense>
               </div>
-              <nav className="flex gap-6 text-sm items-center shrink-0 ml-auto md:ml-0">
+              <nav className="flex gap-5 text-sm items-center shrink-0 ml-auto md:ml-0">
                 <Link
                   href="/"
                   className="text-gray-300 hover:text-gold transition-colors"
                 >
-                  Catálogo
+                  {t.nav.catalog}
                 </Link>
-                <CartBadge />
+                <CartBadge label={t.nav.cart} />
+                <LangSwitcher />
               </nav>
             </div>
           </header>
@@ -73,48 +82,50 @@ export default function RootLayout({
                   ACERVO <span className="text-gradient-gold">DO MANTO</span>
                 </span>
                 <p className="mt-3 text-sm text-gray-400 max-w-sm">
-                  Camisas de futebol de clubes e seleções, retrôs e edições
-                  limitadas. Qualidade e entrega para todo o Brasil.
+                  {t.footer.about}
                 </p>
               </div>
               <div>
-                <h4 className="font-semibold text-sm mb-3 text-gold">Loja</h4>
+                <h4 className="font-semibold text-sm mb-3 text-gold">
+                  {t.footer.shop}
+                </h4>
                 <ul className="space-y-2 text-sm text-gray-400">
                   <li>
                     <Link href="/?categoria=NATIONAL_TEAM" className="hover:text-white">
-                      Seleções
+                      {t.categories.NATIONAL_TEAM}
                     </Link>
                   </li>
                   <li>
                     <Link href="/?categoria=CLUB" className="hover:text-white">
-                      Clubes
+                      {t.categories.CLUB}
                     </Link>
                   </li>
                   <li>
                     <Link href="/?categoria=RETRO" className="hover:text-white">
-                      Retrô
+                      {t.categories.RETRO}
                     </Link>
                   </li>
                   <li>
                     <Link href="/?categoria=LIMITED" className="hover:text-white">
-                      Edição Limitada
+                      {t.categories.LIMITED}
                     </Link>
                   </li>
                 </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-sm mb-3 text-gold">Ajuda</h4>
+                <h4 className="font-semibold text-sm mb-3 text-gold">
+                  {t.footer.help}
+                </h4>
                 <ul className="space-y-2 text-sm text-gray-400">
-                  <li>Entrega para todo o Brasil</li>
-                  <li>Pix, boleto e cartão</li>
-                  <li>Frete grátis acima de R$300</li>
+                  {t.footer.helpItems.map((h) => (
+                    <li key={h}>{h}</li>
+                  ))}
                 </ul>
               </div>
             </div>
             <div className="border-t border-ink-600">
               <div className="mx-auto max-w-6xl px-4 py-5 text-xs text-gray-500">
-                © {new Date().getFullYear()} Acervo do Manto · Todos os direitos
-                reservados
+                © {new Date().getFullYear()} Acervo do Manto · {t.footer.rights}
               </div>
             </div>
           </footer>
