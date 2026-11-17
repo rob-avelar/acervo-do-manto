@@ -83,6 +83,7 @@ export default async function ProductPage({
           image={product.images[0] ?? ""}
           priceCents={product.priceCents}
           sizes={product.sizes}
+          lang={lang}
           labels={{
             size: t.product.size,
             selectSize: t.product.selectSize,

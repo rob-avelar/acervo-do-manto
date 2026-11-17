@@ -80,3 +80,15 @@ export function discountPercent(
   if (!compareCents || compareCents <= priceCents) return null;
   return Math.round(((compareCents - priceCents) / compareCents) * 100);
 }
+
+/**
+ * Moeda efetiva considerando o idioma: a interface em inglês nunca mostra
+ * Reais (um visitante em inglês no Brasil vê em dólar, não em R$).
+ */
+export function effectiveCurrency(
+  cur: Currency,
+  lang: "pt" | "en",
+): Currency {
+  if (lang === "en" && cur === "BRL") return "USD";
+  return cur;
+}

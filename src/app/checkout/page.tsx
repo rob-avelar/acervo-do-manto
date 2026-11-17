@@ -8,6 +8,7 @@ import { formatMoney } from "@/lib/currency";
 import { useCurrency } from "@/lib/use-currency";
 import { useLang } from "@/lib/use-lang";
 import { dict } from "@/lib/i18n";
+import { sizeLabel } from "@/lib/sizes";
 import { createOrder, createStripeCheckout } from "./actions";
 
 export default function CheckoutPage() {
@@ -329,7 +330,7 @@ export default function CheckoutPage() {
                 className="flex justify-between text-sm"
               >
                 <span className="text-gray-300 truncate pr-2">
-                  {i.quantity}× {i.name} ({i.size})
+                  {i.quantity}× {i.name} ({sizeLabel(i.size, lang)})
                 </span>
                 <span className="whitespace-nowrap">
                   {formatMoney(i.priceCents * i.quantity, currency)}

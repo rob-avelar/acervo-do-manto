@@ -6,12 +6,14 @@ import { formatMoney } from "@/lib/currency";
 import { useCurrency } from "@/lib/use-currency";
 import { useLang } from "@/lib/use-lang";
 import { dict } from "@/lib/i18n";
+import { sizeLabel } from "@/lib/sizes";
 import { proxied } from "@/lib/img";
 
 export default function CartPage() {
   const { items, subtotalCents, setQuantity, removeItem } = useCart();
   const currency = useCurrency();
-  const t = dict[useLang()].cart;
+  const lang = useLang();
+  const t = dict[lang].cart;
 
   if (items.length === 0) {
     return (
@@ -60,7 +62,7 @@ export default function CartPage() {
                   {item.name}
                 </Link>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  {t.size}: {item.size}
+                  {t.size}: {sizeLabel(item.size, lang)}
                 </p>
                 <div className="mt-2 flex items-center gap-3">
                   <div className="flex items-center border border-ink-600 rounded-lg">

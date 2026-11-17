@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart";
+import { sizeLabel } from "@/lib/sizes";
+import type { Lang } from "@/lib/i18n";
 
 type Props = {
   productId: string;
@@ -11,6 +13,7 @@ type Props = {
   image: string;
   priceCents: number;
   sizes: string[];
+  lang: Lang;
   labels: {
     size: string;
     selectSize: string;
@@ -27,6 +30,7 @@ export function AddToCart({
   image,
   priceCents,
   sizes,
+  lang,
   labels,
 }: Props) {
   const { addItem } = useCart();
@@ -61,7 +65,7 @@ export function AddToCart({
                   : "border-ink-600 text-gray-200 hover:border-gold"
               }`}
             >
-              {s}
+              {sizeLabel(s, lang)}
             </button>
           ))}
         </div>
