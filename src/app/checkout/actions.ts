@@ -1,5 +1,6 @@
 "use server";
 
+import type Stripe from "stripe";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { getStripe, hasStripe } from "@/lib/stripe";
@@ -169,14 +170,28 @@ export async function createStripeCheckout(
     const origin = siteOrigin();
     const cur = currency.toLowerCase();
 
-    const line_items = items.map((i) => ({
-      quantity: i.quantity,
-      price_data: {
-        currency: cur,
-        unit_amount: targetCents(i.priceCents, currency),
-        product_data: { name: `${i.name} (${i.size})` },
-      },
-    }));
+    // Stripe Tax: só liga quando STRIPE_TAX_ENABLED=true e o país é um código
+    // ISO-2 válido (evita quebrar o checkout antes do Tax estar configurado).
+    const country = (input.address.country || "").toUpperCase();
+    const useTax =
+      process.env.STRIPE_TAX_ENABLED === "true" &&
+      /^[A-Z]{2}$/.test(country) &&
+      country !== "OT";
+
+    const taxBehavior: Stripe.Checkout.SessionCreateParams.LineItem.PriceData["tax_behavior"] =
+      useTax ? "exclusive" : undefined;
+
+    const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = items.map(
+      (i) => ({
+        quantity: i.quantity,
+        price_data: {
+          currency: cur,
+          unit_amount: targetCents(i.priceCents, currency),
+          product_data: { name: `${i.name} (${i.size})` },
+          tax_behavior: taxBehavior,
+        },
+      }),
+    );
 
     if (shippingCents > 0) {
       line_items.push({
@@ -185,18 +200,42 @@ export async function createStripeCheckout(
           currency: cur,
           unit_amount: targetCents(shippingCents, currency),
           product_data: { name: "Frete" },
+          tax_behavior: taxBehavior,
         },
       });
     }
 
-    const session = await getStripe().checkout.sessions.create({
+    const params: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
       line_items,
-      customer_email: customer.email,
       metadata: { orderNumber: order.number },
       success_url: `${origin}/pedido/${order.number}?status=sucesso`,
       cancel_url: `${origin}/checkout?status=cancelado`,
-    });
+    };
+
+    if (useTax) {
+      // Cria um cliente Stripe com o endereço para o cálculo de imposto
+      const sc = await getStripe().customers.create({
+        email: customer.email,
+        name: customer.name,
+        address: {
+          line1:
+            `${input.address.street} ${input.address.number}`.trim() ||
+            input.address.street,
+          city: input.address.city || undefined,
+          state: input.address.state || undefined,
+          postal_code: input.address.cep || undefined,
+          country,
+        },
+      });
+      params.customer = sc.id;
+      params.customer_update = { address: "auto", shipping: "auto" };
+      params.automatic_tax = { enabled: true };
+    } else {
+      params.customer_email = customer.email;
+    }
+
+    const session = await getStripe().checkout.sessions.create(params);
 
     if (!session.url)
       return { ok: false, error: "Não foi possível iniciar o pagamento." };
