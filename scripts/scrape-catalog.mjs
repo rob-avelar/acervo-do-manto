@@ -304,14 +304,21 @@ const products = [
   const footer = `];
 
 async function main() {
+  const slugs = products.map((p) => p.slug);
   for (const p of products) {
     await prisma.storeProduct.upsert({
       where: { slug: p.slug },
-      update: p,
-      create: p,
+      update: { ...p, active: true },
+      create: { ...p, active: true },
     });
   }
-  console.log(\`Seeded \${products.length} store products\`);
+  const off = await prisma.storeProduct.updateMany({
+    where: { slug: { notIn: slugs }, active: true },
+    data: { active: false },
+  });
+  console.log(
+    \`Seeded \${products.length} store products; desativados \${off.count} que sairam do catalogo\`,
+  );
 }
 
 main()
