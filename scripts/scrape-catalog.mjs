@@ -73,7 +73,7 @@ function parseAlbums(html) {
 
 // Itens que NÃO são camisas — pular.
 const SKIP_RE =
-  /\b(shorts|socks|jacket|windbreaker|tracksuit|training suit|training pants|pants|vest|polo|patch|scarf|beanie|hat|cap|gloves|bag|backpack|boot|shoe)\b/i;
+  /\b(shorts|socks|sock|training pants|vest|patch|scarf|beanie|hat|cap|gloves|bag|backpack|boot|shoe)\b/i;
 
 // Seleções nacionais conhecidas (para categoria NATIONAL_TEAM).
 const NATIONS = new Set(
@@ -130,6 +130,12 @@ function classify(title) {
   const isPlayer = /player version/.test(t);
   const isLongSleeve = /long sleeve/.test(t);
   const isPolo = /\bpolo\b/.test(t);
+  const isTrainingSuit = /training suit|tracksuit/.test(t);
+  const isHalfZip = /half zip|zipper/.test(t);
+  const isHooded = /hooded/.test(t);
+  const isJacket = /\bjacket\b|windbreaker/.test(t);
+  const isOuterwear =
+    isTrainingSuit || isHalfZip || isHooded || isJacket || isPolo;
   const isNBA =
     /\bnba\b/.test(t) ||
     /city edition/.test(t) ||
@@ -150,7 +156,17 @@ function classify(title) {
 
   // Preço de venda (R$) + custo do fornecedor (US$ x 5,80) por tipo.
   let priceCents, costCents;
-  if (isNBA) {
+  if (isTrainingSuit) {
+    priceCents = 44990; costCents = 27840; // agasalho completo (kit $48)
+  } else if (isHalfZip) {
+    priceCents = 34990; costCents = 23200; // meio-zíper ($40)
+  } else if (isHooded) {
+    priceCents = 32990; costCents = 20300; // jaqueta com capuz ($35)
+  } else if (isJacket) {
+    priceCents = 32990; costCents = 20880; // jaqueta / corta-vento ($36)
+  } else if (isPolo) {
+    priceCents = 19990; costCents = 11600; // polo + calça
+  } else if (isNBA) {
     priceCents = 22990; costCents = 11600; // $20
   } else if (isRetro) {
     priceCents = 21990; costCents = 10440; // $18
@@ -160,8 +176,6 @@ function classify(title) {
     priceCents = 19990; costCents = 9280; // $16
   } else if (isLongSleeve) {
     priceCents = 18990; costCents = 8120; // $14
-  } else if (isPolo) {
-    priceCents = 16990; costCents = 7540; // $13
   } else if (isKids) {
     priceCents = 17990; costCents = 7540; // $13
   } else {
@@ -184,6 +198,10 @@ function classify(title) {
   if (isPlayer) tags.push('player-version');
   if (isLongSleeve) tags.push('long-sleeve');
   if (isPolo) tags.push('polo');
+  if (isJacket) tags.push('jaqueta');
+  if (isTrainingSuit) tags.push('agasalho');
+  if (isHooded) tags.push('capuz');
+  if (isHalfZip) tags.push('meio-ziper');
   if (isNBA) tags.push('nba');
   if (/world cup/i.test(title)) tags.push('world-cup-2026');
   if (/home/i.test(title)) tags.push('home');
