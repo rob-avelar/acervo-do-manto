@@ -106,7 +106,9 @@ model OrderItem {
   productId  String
   size       String
   quantity   Int
-  priceCents Int // preço unitário no momento da compra (centavos BRL)
+  priceCents Int // preço unitário base no momento da compra (centavos BRL)
+  extraCents Int    @default(0) // adicionais de personalização (nome/número/patch)
+  customization String? // texto da personalização (ex: "Nome: SILVA · Número: 10")
 
   @@index([orderId])
   @@index([productId])

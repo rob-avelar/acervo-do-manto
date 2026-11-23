@@ -5,12 +5,18 @@ import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { getStripe, hasStripe } from "@/lib/stripe";
 import { targetCents, type Currency } from "@/lib/currency";
+import {
+  extraCentsFor,
+  customizationLabel,
+  type Customization,
+} from "@/lib/customization";
 
 export type CheckoutItem = {
   productId: string;
   size: string;
   quantity: number;
   priceCents: number;
+  customization?: Customization;
 };
 
 export type CheckoutInput = {
@@ -67,17 +73,22 @@ async function persistOrder(input: CheckoutInput) {
   const items = input.items.map((i) => {
     const p = byId.get(i.productId);
     if (!p) throw new Error("Produto inválido no carrinho.");
+    // Recalcula o adicional no servidor (não confia no cliente)
+    const extraCents = extraCentsFor(i.customization);
     return {
       productId: i.productId,
       size: i.size,
       quantity: Math.max(1, i.quantity),
       priceCents: p.priceCents,
+      extraCents,
+      customization: i.customization,
+      customizationText: customizationLabel(i.customization, "pt") || null,
       name: p.namePt,
     };
   });
 
   const subtotalCents = items.reduce(
-    (n, i) => n + i.priceCents * i.quantity,
+    (n, i) => n + (i.priceCents + i.extraCents) * i.quantity,
     0,
   );
   const shippingCents = shippingFor(subtotalCents);
@@ -128,6 +139,8 @@ async function persistOrder(input: CheckoutInput) {
           size: i.size,
           quantity: i.quantity,
           priceCents: i.priceCents,
+          extraCents: i.extraCents,
+          customization: i.customizationText,
         })),
       },
     },
@@ -186,8 +199,12 @@ export async function createStripeCheckout(
         quantity: i.quantity,
         price_data: {
           currency: cur,
-          unit_amount: targetCents(i.priceCents, currency),
-          product_data: { name: `${i.name} (${i.size})` },
+          unit_amount: targetCents(i.priceCents + i.extraCents, currency),
+          product_data: {
+            name: `${i.name} (${i.size})${
+              i.customizationText ? ` — ${i.customizationText}` : ""
+            }`,
+          },
           tax_behavior: taxBehavior,
         },
       }),

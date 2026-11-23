@@ -68,6 +68,16 @@ export const dict = {
       infoDelivery: "📦 Entrega para todo o mundo",
       infoPay: "💳 Pagamento seguro",
       infoExchange: "🔁 Troca fácil por tamanho",
+      custom: {
+        title: "Personalização (opcional)",
+        name: "Nome na camisa",
+        namePh: "Ex: SILVA",
+        number: "Número",
+        numberPh: "Ex: 10",
+        patch: "Patch (escudo da liga)",
+        none: "Nenhum",
+        extra: "Adicional",
+      },
     },
     cart: {
       title: "Carrinho",
@@ -206,6 +216,16 @@ export const dict = {
       infoDelivery: "📦 Worldwide shipping",
       infoPay: "💳 Secure payment",
       infoExchange: "🔁 Easy size exchange",
+      custom: {
+        title: "Customization (optional)",
+        name: "Name on shirt",
+        namePh: "e.g. SILVA",
+        number: "Number",
+        numberPh: "e.g. 10",
+        patch: "Patch (league badge)",
+        none: "None",
+        extra: "Add-on",
+      },
     },
     cart: {
       title: "Cart",

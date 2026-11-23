@@ -51,8 +51,18 @@ export default async function OrderPage({
             <span className="text-gray-300">
               {it.quantity}×{" "}
               {lang === "en" ? it.product.nameEn : it.product.namePt} ({sizeLabel(it.size, lang)})
+              {it.customization && (
+                <span className="block text-gold text-xs">
+                  {it.customization}
+                </span>
+              )}
             </span>
-            <span>{formatMoney(it.priceCents * it.quantity, currency)}</span>
+            <span>
+              {formatMoney(
+                (it.priceCents + it.extraCents) * it.quantity,
+                currency,
+              )}
+            </span>
           </div>
         ))}
         <div className="border-t border-ink-600 pt-3 space-y-1 text-sm">

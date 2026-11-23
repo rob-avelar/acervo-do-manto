@@ -9,6 +9,7 @@ import { useCurrency } from "@/lib/use-currency";
 import { useLang } from "@/lib/use-lang";
 import { dict } from "@/lib/i18n";
 import { sizeLabel } from "@/lib/sizes";
+import { customizationLabel } from "@/lib/customization";
 import { createOrder, createStripeCheckout } from "./actions";
 
 export default function CheckoutPage() {
@@ -105,6 +106,7 @@ export default function CheckoutPage() {
         size: i.size,
         quantity: i.quantity,
         priceCents: i.priceCents,
+        customization: i.customization,
       })),
     };
 
@@ -326,14 +328,22 @@ export default function CheckoutPage() {
           <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
             {items.map((i) => (
               <div
-                key={`${i.slug}-${i.size}`}
+                key={i.lineId}
                 className="flex justify-between text-sm"
               >
                 <span className="text-gray-300 truncate pr-2">
                   {i.quantity}× {i.name} ({sizeLabel(i.size, lang)})
+                  {i.customization && (
+                    <span className="block text-gold text-xs">
+                      {customizationLabel(i.customization, lang)}
+                    </span>
+                  )}
                 </span>
                 <span className="whitespace-nowrap">
-                  {formatMoney(i.priceCents * i.quantity, currency)}
+                  {formatMoney(
+                    (i.priceCents + i.extraCents) * i.quantity,
+                    currency,
+                  )}
                 </span>
               </div>
             ))}

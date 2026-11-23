@@ -7,6 +7,7 @@ import { useCurrency } from "@/lib/use-currency";
 import { useLang } from "@/lib/use-lang";
 import { dict } from "@/lib/i18n";
 import { sizeLabel } from "@/lib/sizes";
+import { customizationLabel } from "@/lib/customization";
 import { proxied } from "@/lib/img";
 
 export default function CartPage() {
@@ -39,7 +40,7 @@ export default function CartPage() {
         <div className="lg:col-span-2 space-y-4">
           {items.map((item) => (
             <div
-              key={`${item.slug}-${item.size}`}
+              key={item.lineId}
               className="flex gap-4 border border-ink-600 bg-ink-800 rounded-xl p-3"
             >
               <div className="relative w-20 h-20 shrink-0 bg-ink-700 rounded-lg overflow-hidden">
@@ -64,13 +65,18 @@ export default function CartPage() {
                 <p className="text-xs text-gray-400 mt-0.5">
                   {t.size}: {sizeLabel(item.size, lang)}
                 </p>
+                {item.customization && (
+                  <p className="text-xs text-gold mt-0.5">
+                    {customizationLabel(item.customization, lang)}
+                  </p>
+                )}
                 <div className="mt-2 flex items-center gap-3">
                   <div className="flex items-center border border-ink-600 rounded-lg">
                     <button
                       type="button"
                       className="px-2 py-1 text-lg leading-none"
                       onClick={() =>
-                        setQuantity(item.slug, item.size, item.quantity - 1)
+                        setQuantity(item.lineId, item.quantity - 1)
                       }
                     >
                       −
@@ -80,7 +86,7 @@ export default function CartPage() {
                       type="button"
                       className="px-2 py-1 text-lg leading-none"
                       onClick={() =>
-                        setQuantity(item.slug, item.size, item.quantity + 1)
+                        setQuantity(item.lineId, item.quantity + 1)
                       }
                     >
                       +
@@ -89,14 +95,17 @@ export default function CartPage() {
                   <button
                     type="button"
                     className="text-xs text-gray-400 hover:text-red-500"
-                    onClick={() => removeItem(item.slug, item.size)}
+                    onClick={() => removeItem(item.lineId)}
                   >
                     {t.remove}
                   </button>
                 </div>
               </div>
               <div className="text-right text-sm font-bold text-white whitespace-nowrap">
-                {formatMoney(item.priceCents * item.quantity, currency)}
+                {formatMoney(
+                  (item.priceCents + item.extraCents) * item.quantity,
+                  currency,
+                )}
               </div>
             </div>
           ))}

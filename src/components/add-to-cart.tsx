@@ -1,10 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart";
 import { sizeLabel } from "@/lib/sizes";
-import type { Lang } from "@/lib/i18n";
+import { formatMoney, type Currency } from "@/lib/currency";
+import {
+  ADDON_CENTS,
+  extraCentsFor,
+  type Customization,
+} from "@/lib/customization";
+import { dict, type Lang } from "@/lib/i18n";
+
+const PATCHES = [
+  "Champions League",
+  "Premier League",
+  "La Liga",
+  "Serie A",
+  "Bundesliga",
+  "Ligue 1",
+  "Brasileirão",
+  "Libertadores",
+  "Copa do Mundo",
+];
 
 type Props = {
   productId: string;
@@ -14,6 +32,7 @@ type Props = {
   priceCents: number;
   sizes: string[];
   lang: Lang;
+  currency: Currency;
   labels: {
     size: string;
     selectSize: string;
@@ -31,20 +50,49 @@ export function AddToCart({
   priceCents,
   sizes,
   lang,
+  currency,
   labels,
 }: Props) {
   const { addItem } = useCart();
   const router = useRouter();
+  const t = dict[lang].product.custom;
   const [size, setSize] = useState<string | null>(null);
   const [added, setAdded] = useState(false);
 
+  const [custName, setCustName] = useState("");
+  const [custNumber, setCustNumber] = useState("");
+  const [patch, setPatch] = useState("");
+
+  const customization: Customization = useMemo(
+    () => ({
+      name: custName.trim() || undefined,
+      number: custNumber.trim() || undefined,
+      patch: patch || undefined,
+    }),
+    [custName, custNumber, patch],
+  );
+  const extraCents = extraCentsFor(customization);
+  const unitTotal = priceCents + extraCents;
+
   function handleAdd(goToCart: boolean) {
     if (!size) return;
-    addItem({ productId, slug, name, image, priceCents, size });
+    addItem({
+      productId,
+      slug,
+      name,
+      image,
+      priceCents,
+      size,
+      extraCents,
+      customization: extraCents > 0 ? customization : undefined,
+    });
     setAdded(true);
     if (goToCart) router.push("/carrinho");
     else setTimeout(() => setAdded(false), 2000);
   }
+
+  const input =
+    "w-full rounded-lg border border-ink-600 bg-ink-800 text-white placeholder-gray-500 px-3 py-2 text-sm focus:outline-none focus:border-gold";
 
   return (
     <div>
@@ -71,7 +119,70 @@ export function AddToCart({
         </div>
       </div>
 
-      <div className="mt-6 flex flex-col gap-2">
+      {/* Personalização */}
+      <div className="mt-6 rounded-xl border border-ink-600 bg-ink-800 p-4">
+        <p className="text-sm font-semibold mb-3">✨ {t.title}</p>
+        <div className="space-y-3">
+          <label className="block">
+            <span className="text-xs text-gray-400">
+              {t.name} (+{formatMoney(ADDON_CENTS.name, currency)})
+            </span>
+            <input
+              className={input}
+              placeholder={t.namePh}
+              maxLength={14}
+              value={custName}
+              onChange={(e) => setCustName(e.target.value)}
+            />
+          </label>
+          <label className="block">
+            <span className="text-xs text-gray-400">
+              {t.number} (+{formatMoney(ADDON_CENTS.number, currency)})
+            </span>
+            <input
+              className={input}
+              placeholder={t.numberPh}
+              maxLength={3}
+              inputMode="numeric"
+              value={custNumber}
+              onChange={(e) =>
+                setCustNumber(e.target.value.replace(/\D/g, ""))
+              }
+            />
+          </label>
+          <label className="block">
+            <span className="text-xs text-gray-400">
+              {t.patch} (+{formatMoney(ADDON_CENTS.patch, currency)})
+            </span>
+            <select
+              className={input}
+              value={patch}
+              onChange={(e) => setPatch(e.target.value)}
+            >
+              <option value="">{t.none}</option>
+              {PATCHES.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        {extraCents > 0 && (
+          <p className="mt-3 text-sm text-gold">
+            {t.extra}: +{formatMoney(extraCents, currency)}
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 flex items-baseline gap-2">
+        <span className="text-sm text-gray-400">Total:</span>
+        <span className="text-xl font-bold text-white">
+          {formatMoney(unitTotal, currency)}
+        </span>
+      </div>
+
+      <div className="mt-4 flex flex-col gap-2">
         <button
           type="button"
           disabled={!size}

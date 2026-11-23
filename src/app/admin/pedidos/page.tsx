@@ -113,9 +113,14 @@ export default async function AdminOrdersPage() {
                         <span className="text-gray-300">
                           {it.quantity}× {it.product.namePt}{" "}
                           <span className="text-gold">({it.size})</span>
+                          {it.customization && (
+                            <span className="block text-xs text-yellow-300">
+                              ✎ {it.customization}
+                            </span>
+                          )}
                         </span>
                         <span className="whitespace-nowrap text-gray-400">
-                          {formatBRL(it.priceCents * it.quantity)}
+                          {formatBRL((it.priceCents + it.extraCents) * it.quantity)}
                         </span>
                       </li>
                     ))}
