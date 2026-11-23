@@ -126,22 +126,48 @@ function classify(title) {
   const t = title.toLowerCase();
   const isRetro = /\bretro\b/.test(t);
   const isKids = /\bkids\b/.test(t) || /16-28/.test(title);
-  const isWomen = /\bwomen/.test(t);
+  const isWomen = /\bwomen/.test(t) || /\bfemale\b/.test(t);
   const isPlayer = /player version/.test(t);
+  const isLongSleeve = /long sleeve/.test(t);
+  const isPolo = /\bpolo\b/.test(t);
+  const isNBA =
+    /\bnba\b/.test(t) ||
+    /city edition/.test(t) ||
+    /(warriors|lakers|celtics|bulls|knicks|mavericks|clippers|nuggets|76ers|grizzlies|timberwolves|cavaliers|raptors)/.test(
+      t,
+    );
   const team = extractTeam(title);
   const isNation = NATIONS.has(team.toLowerCase());
   const isLimited =
     /\b(special|anniversary|terrace icons|concept|lifestyle|originals|x )/i.test(title);
 
   let category;
-  if (isRetro) category = 'RETRO';
+  if (isNBA) category = 'CLUB';
+  else if (isRetro) category = 'RETRO';
   else if (isNation) category = 'NATIONAL_TEAM';
   else if (isLimited) category = 'LIMITED';
   else category = 'CLUB';
 
-  let priceCents = 17990; // padrão R$179,90
-  if (isRetro) priceCents = 18990; // retrô R$189,90
-  if (isPlayer) priceCents = 21990; // versão jogador R$219,90
+  // Preço de venda (R$) + custo do fornecedor (US$ x 5,80) por tipo.
+  let priceCents, costCents;
+  if (isNBA) {
+    priceCents = 22990; costCents = 11600; // $20
+  } else if (isRetro) {
+    priceCents = 21990; costCents = 10440; // $18
+  } else if (isPlayer) {
+    priceCents = 21990; costCents = 9860; // $17
+  } else if (isWomen) {
+    priceCents = 19990; costCents = 9280; // $16
+  } else if (isLongSleeve) {
+    priceCents = 18990; costCents = 8120; // $14
+  } else if (isPolo) {
+    priceCents = 16990; costCents = 7540; // $13
+  } else if (isKids) {
+    priceCents = 17990; costCents = 7540; // $13
+  } else {
+    priceCents = 17990; costCents = 6960; // torcedor $12
+  }
+  const compareCents = priceCents + 12000; // preço "de" (riscado)
 
   let sizes;
   if (isKids) sizes = KIDS_SIZES;
@@ -156,11 +182,22 @@ function classify(title) {
   if (isKids) tags.push('kids');
   if (isWomen) tags.push('womens');
   if (isPlayer) tags.push('player-version');
+  if (isLongSleeve) tags.push('long-sleeve');
+  if (isPolo) tags.push('polo');
+  if (isNBA) tags.push('nba');
   if (/world cup/i.test(title)) tags.push('world-cup-2026');
   if (/home/i.test(title)) tags.push('home');
   else if (/away/i.test(title)) tags.push('away');
 
-  return { category, priceCents, sizes, team, tags: [...new Set(tags)] };
+  return {
+    category,
+    priceCents,
+    compareCents,
+    costCents,
+    sizes,
+    team,
+    tags: [...new Set(tags)],
+  };
 }
 
 function jsArr(arr) {
@@ -283,7 +320,7 @@ async function main() {
         a.title,
       )}, namePt: ${JSON.stringify(namePt)}, teamName: ${JSON.stringify(
         teamName,
-      )}, league: '', season: '${season}', category: ProductCategory.${c.category}, priceCents: ${c.priceCents}, comparePriceCents: 29990, images: [IMG('${a.hash}')], sizes: ${sizesExpr}, supplierRef: 'albums/${a.id}', supplierCost: 8700, featured: false, tags: ${jsArr(
+      )}, league: '', season: '${season}', category: ProductCategory.${c.category}, priceCents: ${c.priceCents}, comparePriceCents: ${c.compareCents}, images: [IMG('${a.hash}')], sizes: ${sizesExpr}, supplierRef: 'albums/${a.id}', supplierCost: ${c.costCents}, featured: false, tags: ${jsArr(
         c.tags,
       )} },`,
     );
