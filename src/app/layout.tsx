@@ -71,6 +71,12 @@ export default function RootLayout({
                 >
                   {t.nav.catalog}
                 </Link>
+                <Link
+                  href="/conta"
+                  className="text-gray-300 hover:text-gold transition-colors"
+                >
+                  {t.account.nav}
+                </Link>
                 <CartBadge label={t.nav.cart} />
                 <CurrencySwitcher />
                 <LangSwitcher />

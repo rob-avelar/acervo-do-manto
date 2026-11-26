@@ -48,15 +48,16 @@ enum ProductCategory {
 }
 
 model Customer {
-  id        String    @id @default(cuid())
-  name      String
-  email     String    @unique
-  phone     String?
-  cpf       String? // CPF do cliente (Brasil)
-  addresses Address[]
-  orders    Order[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  phone        String?
+  cpf          String? // CPF do cliente (Brasil)
+  passwordHash String? // definido quando o cliente cria uma conta (login)
+  addresses    Address[]
+  orders       Order[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Address {

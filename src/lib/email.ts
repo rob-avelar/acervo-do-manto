@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { formatBRL } from "./currency";
+import { formatMoney } from "./currency";
 
 // Envio via SMTP do Google Workspace (conta support@acervodomanto.com).
 // Configurado por variáveis de ambiente no Vercel:
@@ -115,21 +115,21 @@ export async function sendOrderEmails(data: OrderEmailData) {
     }),
   ];
 
-  // Dono (aviso de novo pedido, com valores em R$)
+  // Dono (aviso de novo pedido, em inglês e com valores em euro)
   if (owner) {
     sends.push(
       t.sendMail({
         from,
         to: owner,
-        subject: `🛒 Novo pedido ${data.number} — ${data.customerName}`,
-        html: `<h2>Novo pedido: ${data.number}</h2>
-<p><strong>Cliente:</strong> ${data.customerName} · ${data.customerEmail}</p>
-<p><strong>Entrega:</strong><br>${addressHtml(data.address)}</p>
-<p><strong>Itens:</strong></p><ul>${itemsHtml(data.items)}</ul>
-<p>Subtotal: ${formatBRL(data.subtotalCents)}<br>
-Frete: ${formatBRL(data.shippingCents)}<br>
-<strong>Total: ${formatBRL(data.totalCents)}</strong></p>
-<p>Veja no painel: https://acervodomanto.com/admin/pedidos</p>`,
+        subject: `🛒 New order ${data.number} — ${data.customerName}`,
+        html: `<h2>New order: ${data.number}</h2>
+<p><strong>Customer:</strong> ${data.customerName} · ${data.customerEmail}</p>
+<p><strong>Delivery:</strong><br>${addressHtml(data.address)}</p>
+<p><strong>Items:</strong></p><ul>${itemsHtml(data.items)}</ul>
+<p>Subtotal: ${formatMoney(data.subtotalCents, "EUR")}<br>
+Shipping: ${formatMoney(data.shippingCents, "EUR")}<br>
+<strong>Total: ${formatMoney(data.totalCents, "EUR")}</strong></p>
+<p>View in dashboard: https://acervodomanto.com/admin/pedidos</p>`,
       }),
     );
   }
