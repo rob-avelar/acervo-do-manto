@@ -4,6 +4,7 @@ import type { ProductCategory, Prisma } from "@prisma/client";
 
 export interface ProductFilters {
   category?: ProductCategory;
+  tagsAny?: string[]; // filtra produtos que tenham qualquer uma destas tags
   team?: string;
   league?: string;
   search?: string;
@@ -19,10 +20,19 @@ const REVALIDATE = 600; // 10 minutos
 /** Lista produtos ativos com filtros e paginação. */
 export const listProducts = unstable_cache(
   async (filters: ProductFilters = {}) => {
-    const { category, team, league, search, page = 1, perPage = 24 } = filters;
+    const {
+      category,
+      tagsAny,
+      team,
+      league,
+      search,
+      page = 1,
+      perPage = 24,
+    } = filters;
 
     const where: Prisma.StoreProductWhereInput = { active: true };
     if (category) where.category = category;
+    if (tagsAny && tagsAny.length) where.tags = { hasSome: tagsAny };
     if (team) where.teamName = team;
     if (league) where.league = league;
     if (search) {

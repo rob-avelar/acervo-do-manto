@@ -140,6 +140,11 @@ export default function RootLayout({
                       {t.categories.LIMITED}
                     </Link>
                   </li>
+                  <li>
+                    <Link href="/?categoria=JAQUETAS" className="hover:text-white">
+                      {t.jacketsCat}
+                    </Link>
+                  </li>
                 </ul>
               </div>
               <div>

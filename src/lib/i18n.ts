@@ -48,6 +48,7 @@ export const dict = {
     highlights: "Destaques",
     highlightsOverline: "Seleção da casa",
     seeMore: "Ver camisas →",
+    jacketsCat: "Jaquetas",
     catalog: {
       all: "Todas as camisas",
       results: (q: string) => `Resultados para “${q}”`,
@@ -231,6 +232,7 @@ export const dict = {
     highlights: "Highlights",
     highlightsOverline: "Our picks",
     seeMore: "Shop now →",
+    jacketsCat: "Jackets",
     catalog: {
       all: "All shirts",
       results: (q: string) => `Results for “${q}”`,
@@ -415,6 +417,7 @@ export const dict = {
     highlights: "Destacados",
     highlightsOverline: "Nuestra selección",
     seeMore: "Comprar ahora →",
+    jacketsCat: "Chaquetas",
     catalog: {
       all: "Todas las camisetas",
       results: (q: string) => `Resultados para “${q}”`,
@@ -598,6 +601,7 @@ export const dict = {
     highlights: "Uitgelicht",
     highlightsOverline: "Onze keuze",
     seeMore: "Nu shoppen →",
+    jacketsCat: "Jassen",
     catalog: {
       all: "Alle shirts",
       results: (q: string) => `Resultaten voor “${q}”`,

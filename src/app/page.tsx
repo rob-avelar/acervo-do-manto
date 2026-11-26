@@ -15,15 +15,25 @@ import type { ProductCategory } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
+// Tags que compõem a categoria virtual "Jaquetas" (agasalhos, jaquetas,
+// moletom com capuz e meio-zíper — inclui conjuntos com calça).
+const JACKET_TAGS = ["jaqueta", "agasalho", "capuz", "meio-ziper"];
+
 export default async function HomePage({
   searchParams,
 }: {
   searchParams: { categoria?: string; busca?: string; pagina?: string };
 }) {
-  const category = searchParams.categoria as ProductCategory | undefined;
+  const rawCat = searchParams.categoria;
+  // "JAQUETAS" é uma categoria virtual: filtra por tags (agasalho/jaqueta/
+  // moletom/meio-zíper), já que esses produtos não têm categoria no enum.
+  const isJackets = rawCat === "JAQUETAS";
+  const category = isJackets
+    ? undefined
+    : (rawCat as ProductCategory | undefined);
   const search = searchParams.busca;
   const page = Number(searchParams.pagina ?? "1");
-  const isBrowsing = Boolean(category || search || page > 1);
+  const isBrowsing = Boolean(rawCat || search || page > 1);
   const currency = getServerCurrency();
   const lang = getServerLang();
   const t = dict[lang];
@@ -31,6 +41,7 @@ export default async function HomePage({
 
   const { items, total, pages } = await listProducts({
     category,
+    tagsAny: isJackets ? JACKET_TAGS : undefined,
     search,
     page,
   });
@@ -117,13 +128,15 @@ export default async function HomePage({
             <h2 className="font-display text-3xl font-bold">
               {search
                 ? t.catalog.results(search)
-                : category
-                  ? catLabel(category)
-                  : t.catalog.all}
+                : isJackets
+                  ? t.jacketsCat
+                  : category
+                    ? catLabel(category)
+                    : t.catalog.all}
             </h2>
             <p className="text-gray-400 mt-1 text-sm">
               {t.catalog.count(total)}
-              {(search || category) && (
+              {(search || rawCat) && (
                 <>
                   {" · "}
                   <Link href="/" className="text-gold hover:underline">
@@ -139,7 +152,7 @@ export default async function HomePage({
             <FilterChip
               label={t.catalog.all_filter}
               href="/"
-              active={!category && !search}
+              active={!rawCat && !search}
             />
             {CATEGORY_ORDER.map((cat) => (
               <FilterChip
@@ -149,6 +162,11 @@ export default async function HomePage({
                 active={category === cat}
               />
             ))}
+            <FilterChip
+              label={t.jacketsCat}
+              href="/?categoria=JAQUETAS"
+              active={isJackets}
+            />
           </div>
 
           {items.length === 0 ? (
