@@ -130,13 +130,14 @@ function classify(title) {
   const isPlayer = /player version/.test(t);
   const isLongSleeve = /long sleeve/.test(t);
   const isPolo = /\bpolo\b/.test(t);
-  // "Pre-match" é camiseta de aquecimento (não é conjunto), mesmo quando o
-  // título do fornecedor diz "training suit".
-  const isPreMatch = /pre[-\s]?match/.test(t);
-  const isTrainingSuit = !isPreMatch && /training suit|tracksuit/.test(t);
-  const isHalfZip = /half zip|zipper/.test(t);
-  const isHooded = /hooded/.test(t);
-  const isJacket = /\bjacket\b|windbreaker/.test(t);
+  // Se o título indica uma CAMISA (shirt/jersey/manga curta/pré-jogo), não é
+  // agasalho/jaqueta — mesmo que contenha palavras como "training suit" ou
+  // "zipper". Evita classificar camisas como jaquetas (preço de conjunto).
+  const isShirtLike = /\bshirt\b|\bjersey\b|short sleeve|pre[-\s]?match/.test(t);
+  const isTrainingSuit = !isShirtLike && /training suit|tracksuit/.test(t);
+  const isHalfZip = !isShirtLike && /half[-\s]?zip/.test(t);
+  const isHooded = !isShirtLike && /hooded/.test(t);
+  const isJacket = !isShirtLike && /\bjacket\b|windbreaker/.test(t);
   const isOuterwear =
     isTrainingSuit || isHalfZip || isHooded || isJacket || isPolo;
   const isNBA =
