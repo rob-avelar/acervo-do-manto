@@ -131,6 +131,10 @@ export const dict = {
         `Pagamento confirmado! Enviamos os detalhes para ${e} e já vamos preparar seu envio.`,
       pending: (e: string) =>
         `Enviamos os detalhes para ${e}. Assim que o pagamento for confirmado, preparamos seu envio.`,
+      paidNoEmail:
+        "Pagamento confirmado! Já estamos preparando seu envio. Guarde o número do pedido.",
+      pendingNoEmail:
+        "Recebemos seu pedido! Assim que o pagamento for confirmado, preparamos seu envio. Guarde o número do pedido.",
       items: "Itens",
       delivery: "Entrega",
       back: "Voltar ao catálogo",
@@ -279,6 +283,10 @@ export const dict = {
         `Payment confirmed! We've sent the details to ${e} and we'll prepare your shipment.`,
       pending: (e: string) =>
         `We've sent the details to ${e}. Once payment is confirmed, we'll prepare your shipment.`,
+      paidNoEmail:
+        "Payment confirmed! We're preparing your shipment. Please keep your order number.",
+      pendingNoEmail:
+        "We've received your order! Once payment is confirmed, we'll prepare your shipment. Please keep your order number.",
       items: "Items",
       delivery: "Delivery",
       back: "Back to catalog",

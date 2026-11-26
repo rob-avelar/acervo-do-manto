@@ -5,6 +5,7 @@ import { formatMoney } from "@/lib/currency";
 import { getServerCurrency } from "@/lib/currency-server";
 import { getServerLang } from "@/lib/lang-server";
 import { dict } from "@/lib/i18n";
+import { emailEnabled } from "@/lib/email";
 import { sizeLabel } from "@/lib/sizes";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +29,7 @@ export default async function OrderPage({
   const lang = getServerLang();
   const t = dict[lang];
   const to = t.order;
+  const hasEmail = emailEnabled();
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
@@ -39,8 +41,12 @@ export default async function OrderPage({
         </p>
         <p className="text-gray-400 text-sm mt-2">
           {order.status === "PAID"
-            ? to.paid(order.customer.email)
-            : to.pending(order.customer.email)}
+            ? hasEmail
+              ? to.paid(order.customer.email)
+              : to.paidNoEmail
+            : hasEmail
+              ? to.pending(order.customer.email)
+              : to.pendingNoEmail}
         </p>
       </div>
 

@@ -4,6 +4,7 @@ import type Stripe from "stripe";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { getStripe, hasStripe } from "@/lib/stripe";
+import { sendOrderEmails } from "@/lib/email";
 import { targetCents, type Currency } from "@/lib/currency";
 import {
   extraCentsFor,
@@ -145,6 +146,36 @@ async function persistOrder(input: CheckoutInput) {
       },
     },
   });
+
+  // E-mails: confirmação ao cliente + aviso ao dono (se configurado)
+  try {
+    await sendOrderEmails({
+      number: order.number,
+      customerName: customer.name,
+      customerEmail: customer.email,
+      items: items.map((i) => ({
+        name: i.name,
+        size: i.size,
+        quantity: i.quantity,
+        customizationText: i.customizationText,
+      })),
+      subtotalCents,
+      shippingCents,
+      totalCents,
+      address: {
+        street: address.street,
+        number: address.number,
+        complement: address.complement,
+        neighborhood: address.neighborhood,
+        city: address.city,
+        state: address.state,
+        cep: address.cep,
+        country: address.country,
+      },
+    });
+  } catch (e) {
+    console.error("Falha ao enviar e-mails do pedido:", e);
+  }
 
   return { order, items, customer, subtotalCents, shippingCents };
 }
