@@ -7,6 +7,7 @@ import { CartProvider } from "@/lib/cart";
 import { CartBadge } from "@/components/cart-badge";
 import { SearchBar } from "@/components/search-bar";
 import { LangSwitcher } from "@/components/lang-switcher";
+import { CurrencySwitcher } from "@/components/currency-switcher";
 import { getServerLang } from "@/lib/lang-server";
 import { getServerCurrency } from "@/lib/currency-server";
 import { formatMoney, FREE_SHIPPING_CENTS } from "@/lib/currency";
@@ -71,6 +72,7 @@ export default function RootLayout({
                   {t.nav.catalog}
                 </Link>
                 <CartBadge label={t.nav.cart} />
+                <CurrencySwitcher />
                 <LangSwitcher />
               </nav>
             </div>

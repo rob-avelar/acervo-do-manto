@@ -3,9 +3,13 @@ import { currencyForCountry } from "./geo";
 import { effectiveCurrency, type Currency } from "./currency";
 import { getServerLang } from "./lang-server";
 
-/** Moeda de exibição no servidor: usa o cookie (middleware) ou o header de país,
- *  aplicando a regra de que a interface em inglês nunca mostra Reais. */
+/** Moeda de exibição no servidor. A escolha manual do cliente (curManual)
+ *  tem prioridade; senão usa o cookie/geo com a regra de inglês nunca mostrar
+ *  Reais. */
 export function getServerCurrency(): Currency {
+  const manual = cookies().get("curManual")?.value;
+  if (manual === "BRL" || manual === "USD" || manual === "EUR") return manual;
+
   const c = cookies().get("cur")?.value;
   let cur: Currency;
   if (c === "BRL" || c === "USD" || c === "EUR") {
