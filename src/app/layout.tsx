@@ -56,7 +56,7 @@ export default function RootLayout({
                 <img
                   src="/logo.png"
                   alt="Acervo do Manto"
-                  className="h-14 w-auto object-contain"
+                  className="h-16 w-16 md:h-[72px] md:w-[72px] object-contain"
                 />
               </Link>
               <div className="order-3 w-full md:order-none md:flex-1 md:w-auto">
@@ -64,22 +64,39 @@ export default function RootLayout({
                   <SearchBar placeholder={t.search} />
                 </Suspense>
               </div>
-              <nav className="flex gap-5 text-sm items-center shrink-0 ml-auto md:ml-0">
+              <nav className="flex gap-4 text-sm items-center shrink-0 ml-auto md:ml-0">
                 <Link
                   href="/"
-                  className="text-gray-300 hover:text-gold transition-colors"
+                  className="hidden sm:inline text-gray-300 hover:text-gold transition-colors"
                 >
                   {t.nav.catalog}
                 </Link>
                 <Link
                   href="/conta"
+                  aria-label={t.account.nav}
                   className="text-gray-300 hover:text-gold transition-colors"
                 >
-                  {t.account.nav}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.8}
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                    />
+                  </svg>
                 </Link>
                 <CartBadge label={t.nav.cart} />
-                <CurrencySwitcher />
-                <LangSwitcher />
+                <span className="h-5 w-px bg-ink-600" aria-hidden />
+                <div className="flex items-center gap-3">
+                  <CurrencySwitcher />
+                  <LangSwitcher />
+                </div>
               </nav>
             </div>
           </header>
