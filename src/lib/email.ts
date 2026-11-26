@@ -136,3 +136,111 @@ Frete: ${formatBRL(data.shippingCents)}<br>
 
   await Promise.allSettled(sends);
 }
+
+// ---- E-mail de atualização de status do pedido ----
+
+type OrderStatusName =
+  | "PENDING"
+  | "PAID"
+  | "PROCESSING"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED";
+
+type StatusEmailData = {
+  number: string;
+  customerName: string;
+  customerEmail: string;
+  country: string;
+  status: OrderStatusName;
+  trackingCode?: string | null;
+};
+
+// Textos por status (pt para Brasil, en para o resto). Null = não envia e-mail
+// para esse status (ex.: PENDING não vale uma notificação ao cliente).
+function statusCopy(
+  status: OrderStatusName,
+  isBR: boolean,
+  number: string,
+  tracking?: string | null,
+): { subject: string; html: string } | null {
+  const track =
+    tracking && tracking.trim()
+      ? isBR
+        ? `<p><strong>Código de rastreio:</strong> ${tracking}</p>`
+        : `<p><strong>Tracking code:</strong> ${tracking}</p>`
+      : "";
+
+  const sign = isBR ? `<p>— Acervo do Manto</p>` : `<p>— Acervo do Manto</p>`;
+
+  switch (status) {
+    case "PAID":
+      return isBR
+        ? {
+            subject: `Pagamento confirmado — Pedido ${number}`,
+            html: `<h2>Pagamento confirmado! ✅</h2><p>Recebemos o pagamento do seu pedido <strong>${number}</strong>. Já vamos preparar o envio.</p>${sign}`,
+          }
+        : {
+            subject: `Payment confirmed — Order ${number}`,
+            html: `<h2>Payment confirmed! ✅</h2><p>We've received payment for your order <strong>${number}</strong>. We'll start preparing your shipment.</p>${sign}`,
+          };
+    case "PROCESSING":
+      return isBR
+        ? {
+            subject: `Pedido em preparação — ${number}`,
+            html: `<h2>Seu pedido está sendo preparado 📦</h2><p>O pedido <strong>${number}</strong> entrou em separação. Em breve ele será enviado.</p>${sign}`,
+          }
+        : {
+            subject: `Order being prepared — ${number}`,
+            html: `<h2>Your order is being prepared 📦</h2><p>Order <strong>${number}</strong> is now being packed. It will be shipped soon.</p>${sign}`,
+          };
+    case "SHIPPED":
+      return isBR
+        ? {
+            subject: `Seu pedido foi enviado! — ${number}`,
+            html: `<h2>Seu pedido está a caminho! 🚚</h2><p>O pedido <strong>${number}</strong> foi enviado.</p>${track}<p>Fique de olho, logo chega aí!</p>${sign}`,
+          }
+        : {
+            subject: `Your order has shipped! — ${number}`,
+            html: `<h2>Your order is on its way! 🚚</h2><p>Order <strong>${number}</strong> has been shipped.</p>${track}<p>Keep an eye out — it'll arrive soon!</p>${sign}`,
+          };
+    case "DELIVERED":
+      return isBR
+        ? {
+            subject: `Pedido entregue — ${number}`,
+            html: `<h2>Pedido entregue! 🎉</h2><p>O pedido <strong>${number}</strong> foi marcado como entregue. Esperamos que você curta sua nova camisa!</p><p>Qualquer coisa, é só responder este e-mail.</p>${sign}`,
+          }
+        : {
+            subject: `Order delivered — ${number}`,
+            html: `<h2>Order delivered! 🎉</h2><p>Order <strong>${number}</strong> has been marked as delivered. We hope you love your new shirt!</p><p>Reply to this email if you need anything.</p>${sign}`,
+          };
+    case "CANCELLED":
+      return isBR
+        ? {
+            subject: `Pedido cancelado — ${number}`,
+            html: `<h2>Pedido cancelado</h2><p>O pedido <strong>${number}</strong> foi cancelado. Se tiver qualquer dúvida sobre reembolso, responda este e-mail.</p>${sign}`,
+          }
+        : {
+            subject: `Order cancelled — ${number}`,
+            html: `<h2>Order cancelled</h2><p>Order <strong>${number}</strong> has been cancelled. If you have any questions about a refund, just reply to this email.</p>${sign}`,
+          };
+    default:
+      return null; // PENDING não notifica
+  }
+}
+
+/** Envia e-mail ao cliente quando o status do pedido muda. */
+export async function sendStatusEmail(data: StatusEmailData) {
+  if (!emailEnabled()) return;
+  const isBR = data.country.toUpperCase() === "BR";
+  const copy = statusCopy(data.status, isBR, data.number, data.trackingCode);
+  if (!copy) return; // status sem notificação
+
+  const from = fromAddress();
+  await getTransporter().sendMail({
+    from,
+    to: data.customerEmail,
+    subject: copy.subject,
+    html: copy.html,
+  });
+}
