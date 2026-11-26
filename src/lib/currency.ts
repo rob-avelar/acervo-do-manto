@@ -87,8 +87,8 @@ export function discountPercent(
  */
 export function effectiveCurrency(
   cur: Currency,
-  lang: "pt" | "en",
+  lang: "pt" | "en" | "es" | "nl",
 ): Currency {
-  if (lang === "en" && cur === "BRL") return "EUR";
+  if (lang !== "pt" && cur === "BRL") return "EUR";
   return cur;
 }

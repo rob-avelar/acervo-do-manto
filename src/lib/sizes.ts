@@ -17,6 +17,7 @@ const BR_TO_INTL: Record<string, string> = {
  * (o fornecedor usa o padrão brasileiro).
  */
 export function sizeLabel(size: string, lang: Lang): string {
-  if (lang === "en") return BR_TO_INTL[size] ?? size;
+  // Qualquer idioma que não seja português usa o padrão internacional.
+  if (lang !== "pt") return BR_TO_INTL[size] ?? size;
   return size;
 }

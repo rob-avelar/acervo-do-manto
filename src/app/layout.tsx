@@ -37,7 +37,9 @@ export default function RootLayout({
 
   return (
     <html
-      lang={lang === "pt" ? "pt-BR" : "en"}
+      lang={
+        lang === "pt" ? "pt-BR" : lang === "es" ? "es" : lang === "nl" ? "nl" : "en"
+      }
       className={`${inter.variable} ${oswald.variable}`}
     >
       <body className="min-h-screen flex flex-col bg-ink text-white font-sans">

@@ -7,7 +7,7 @@ import type { Lang } from "./i18n";
 export function useLang(): Lang {
   const [lang, setLang] = useState<Lang>("pt");
   useEffect(() => {
-    const m = document.cookie.match(/(?:^|;\s*)lang=(pt|en)/);
+    const m = document.cookie.match(/(?:^|;\s*)lang=(pt|en|es|nl)/);
     if (m) setLang(m[1] as Lang);
   }, []);
   return lang;

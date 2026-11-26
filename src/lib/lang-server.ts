@@ -4,7 +4,7 @@ import { langForCountry, type Lang } from "./i18n";
 /** Idioma no servidor: cookie (escolha do usuário) ou país detectado. */
 export function getServerLang(): Lang {
   const c = cookies().get("lang")?.value;
-  if (c === "pt" || c === "en") return c;
+  if (c === "pt" || c === "en" || c === "es" || c === "nl") return c;
   const country = headers().get("x-vercel-ip-country") ?? "BR";
   return langForCountry(country);
 }

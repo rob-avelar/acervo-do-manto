@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { StoreProduct } from "@prisma/client";
 import { formatMoney, discountPercent, type Currency } from "@/lib/currency";
 import type { Lang } from "@/lib/i18n";
+import { productName } from "@/lib/product-name";
 import { proxied } from "@/lib/img";
 
 export function ProductCard({
@@ -13,7 +14,7 @@ export function ProductCard({
   currency?: Currency;
   lang?: Lang;
 }) {
-  const name = lang === "en" ? product.nameEn : product.namePt;
+  const name = productName(product, lang);
   const desconto = discountPercent(
     product.priceCents,
     product.comparePriceCents,

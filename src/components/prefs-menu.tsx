@@ -10,6 +10,8 @@ import type { Currency } from "@/lib/currency";
 const LANGS: { code: Lang; label: string }[] = [
   { code: "pt", label: "Português" },
   { code: "en", label: "English" },
+  { code: "es", label: "Español" },
+  { code: "nl", label: "Nederlands" },
 ];
 
 const CURRENCIES: { code: Currency; symbol: string; label: string }[] = [

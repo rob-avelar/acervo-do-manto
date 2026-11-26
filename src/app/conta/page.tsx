@@ -10,13 +10,36 @@ import { dict } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
-const STATUS_LABELS: Record<string, { pt: string; en: string }> = {
-  PENDING: { pt: "Aguardando pagamento", en: "Awaiting payment" },
-  PAID: { pt: "Pago", en: "Paid" },
-  PROCESSING: { pt: "Em preparação", en: "Processing" },
-  SHIPPED: { pt: "Enviado", en: "Shipped" },
-  DELIVERED: { pt: "Entregue", en: "Delivered" },
-  CANCELLED: { pt: "Cancelado", en: "Cancelled" },
+const STATUS_LABELS: Record<
+  string,
+  { pt: string; en: string; es: string; nl: string }
+> = {
+  PENDING: {
+    pt: "Aguardando pagamento",
+    en: "Awaiting payment",
+    es: "Esperando pago",
+    nl: "Wacht op betaling",
+  },
+  PAID: { pt: "Pago", en: "Paid", es: "Pagado", nl: "Betaald" },
+  PROCESSING: {
+    pt: "Em preparação",
+    en: "Processing",
+    es: "En preparación",
+    nl: "In verwerking",
+  },
+  SHIPPED: { pt: "Enviado", en: "Shipped", es: "Enviado", nl: "Verzonden" },
+  DELIVERED: {
+    pt: "Entregue",
+    en: "Delivered",
+    es: "Entregado",
+    nl: "Geleverd",
+  },
+  CANCELLED: {
+    pt: "Cancelado",
+    en: "Cancelled",
+    es: "Cancelado",
+    nl: "Geannuleerd",
+  },
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -47,7 +70,10 @@ export default async function AccountPage() {
     },
   });
 
-  const dateFmt = new Intl.DateTimeFormat(lang === "pt" ? "pt-BR" : "en-GB", {
+  const dateLocale = { pt: "pt-BR", en: "en-GB", es: "es-ES", nl: "nl-NL" }[
+    lang
+  ];
+  const dateFmt = new Intl.DateTimeFormat(dateLocale, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

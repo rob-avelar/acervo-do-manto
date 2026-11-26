@@ -7,6 +7,7 @@ import { getServerLang } from "@/lib/lang-server";
 import { dict } from "@/lib/i18n";
 import { emailEnabled } from "@/lib/email";
 import { sizeLabel } from "@/lib/sizes";
+import { productName } from "@/lib/product-name";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +57,7 @@ export default async function OrderPage({
           <div key={it.id} className="flex justify-between text-sm">
             <span className="text-gray-300">
               {it.quantity}×{" "}
-              {lang === "en" ? it.product.nameEn : it.product.namePt} ({sizeLabel(it.size, lang)})
+              {productName(it.product, lang)} ({sizeLabel(it.size, lang)})
               {it.customization && (
                 <span className="block text-gold text-xs">
                   {it.customization}

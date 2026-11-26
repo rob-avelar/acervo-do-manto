@@ -4,6 +4,7 @@ import { formatMoney, discountPercent } from "@/lib/currency";
 import { getServerCurrency } from "@/lib/currency-server";
 import { getServerLang } from "@/lib/lang-server";
 import { dict } from "@/lib/i18n";
+import { productName } from "@/lib/product-name";
 import { AddToCart } from "@/components/add-to-cart";
 import { proxied } from "@/lib/img";
 
@@ -20,7 +21,7 @@ export default async function ProductPage({
   const currency = getServerCurrency();
   const lang = getServerLang();
   const t = dict[lang];
-  const name = lang === "en" ? product.nameEn : product.namePt;
+  const name = productName(product, lang);
   const desconto = discountPercent(
     product.priceCents,
     product.comparePriceCents,
