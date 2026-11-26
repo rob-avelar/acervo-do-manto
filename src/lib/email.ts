@@ -1,14 +1,37 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { formatBRL } from "./currency";
 
-let _resend: Resend | null = null;
-function getResend(): Resend {
-  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY ?? "");
-  return _resend;
+// Envio via SMTP do Google Workspace (conta support@acervodomanto.com).
+// Configurado por variáveis de ambiente no Vercel:
+//   SMTP_USER  = support@acervodomanto.com
+//   SMTP_PASS  = senha de app do Google (16 caracteres, sem espaços)
+//   EMAIL_FROM = (opcional) remetente exibido; padrão usa SMTP_USER
+//   OWNER_EMAIL= (opcional) e-mail que recebe aviso de novo pedido
+
+let _transporter: nodemailer.Transporter | null = null;
+function getTransporter(): nodemailer.Transporter {
+  if (!_transporter) {
+    _transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.SMTP_USER ?? "",
+        pass: (process.env.SMTP_PASS ?? "").replace(/\s+/g, ""),
+      },
+    });
+  }
+  return _transporter;
 }
 
 export function emailEnabled() {
-  return Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
+  return Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
+}
+
+// Remetente: usa EMAIL_FROM se definido, senão monta a partir do SMTP_USER.
+function fromAddress() {
+  const user = process.env.SMTP_USER ?? "";
+  return process.env.EMAIL_FROM || `Acervo do Manto <${user}>`;
 }
 
 type OrderEmailItem = {
@@ -60,9 +83,10 @@ function addressHtml(a: OrderEmailData["address"]) {
 /** Envia e-mail de confirmação ao cliente e aviso de novo pedido ao dono. */
 export async function sendOrderEmails(data: OrderEmailData) {
   if (!emailEnabled()) return;
-  const from = process.env.EMAIL_FROM as string;
+  const from = fromAddress();
   const owner = process.env.OWNER_EMAIL;
   const isBR = data.address.country.toUpperCase() === "BR";
+  const t = getTransporter();
 
   // Cliente
   const customerSubject = isBR
@@ -83,7 +107,7 @@ export async function sendOrderEmails(data: OrderEmailData) {
 <p>— Acervo do Manto</p>`;
 
   const sends: Promise<unknown>[] = [
-    getResend().emails.send({
+    t.sendMail({
       from,
       to: data.customerEmail,
       subject: customerSubject,
@@ -94,7 +118,7 @@ export async function sendOrderEmails(data: OrderEmailData) {
   // Dono (aviso de novo pedido, com valores em R$)
   if (owner) {
     sends.push(
-      getResend().emails.send({
+      t.sendMail({
         from,
         to: owner,
         subject: `🛒 Novo pedido ${data.number} — ${data.customerName}`,
