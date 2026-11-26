@@ -37,17 +37,17 @@ export default function CheckoutPage() {
     state: "",
   });
 
-  // País padrão conforme a moeda detectada (só se ainda não escolhido)
+  // País padrão conforme a moeda detectada — acompanha a moeda enquanto o
+  // cliente não escolher o país manualmente.
+  const [countryTouched, setCountryTouched] = useState(false);
   useEffect(() => {
-    setForm((f) => {
-      if (f.country) return f;
-      const def =
-        currency === "BRL" ? "BR" : currency === "EUR" ? "PT" : "US";
-      return { ...f, country: def };
-    });
-  }, [currency]);
+    if (countryTouched) return;
+    const def =
+      currency === "BRL" ? "BR" : currency === "EUR" ? "PT" : "US";
+    setForm((f) => (f.country === def ? f : { ...f, country: def }));
+  }, [currency, countryTouched]);
 
-  const isBrazil = (form.country || "BR") === "BR";
+  const isBrazil = form.country === "BR";
 
   const shippingCents = subtotalCents >= 30000 ? 0 : 2490;
   const totalCents = subtotalCents + shippingCents;
@@ -196,7 +196,10 @@ export default function CheckoutPage() {
             <select
               className={input}
               value={form.country || "BR"}
-              onChange={(e) => set("country", e.target.value)}
+              onChange={(e) => {
+                setCountryTouched(true);
+                set("country", e.target.value);
+              }}
             >
               <option value="BR">Brasil</option>
               <option value="PT">Portugal</option>
