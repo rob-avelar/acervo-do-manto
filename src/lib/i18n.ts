@@ -170,6 +170,18 @@ export const dict = {
       fillAll: "Preencha todos os campos.",
       shortPassword: "A senha deve ter pelo menos 6 caracteres.",
       profile: "Seus dados",
+      forgot: "Esqueci minha senha",
+      forgotTitle: "Recuperar senha",
+      forgotIntro:
+        "Digite seu e-mail e enviaremos um link para redefinir sua senha.",
+      sendLink: "Enviar link",
+      resetSent:
+        "Se este e-mail tiver uma conta, enviamos um link para redefinir a senha. Confira sua caixa de entrada (e o spam).",
+      resetTitle: "Definir nova senha",
+      newPassword: "Nova senha",
+      resetBtn: "Salvar nova senha",
+      invalidToken: "Link inválido ou expirado. Peça um novo.",
+      backToLogin: "Voltar ao login",
     },
     footer: {
       about:
@@ -354,6 +366,18 @@ export const dict = {
       fillAll: "Please fill in all fields.",
       shortPassword: "Password must be at least 6 characters.",
       profile: "Your details",
+      forgot: "Forgot your password?",
+      forgotTitle: "Reset password",
+      forgotIntro:
+        "Enter your email and we'll send you a link to reset your password.",
+      sendLink: "Send link",
+      resetSent:
+        "If this email has an account, we've sent a password reset link. Check your inbox (and spam).",
+      resetTitle: "Set a new password",
+      newPassword: "New password",
+      resetBtn: "Save new password",
+      invalidToken: "Invalid or expired link. Please request a new one.",
+      backToLogin: "Back to sign in",
     },
     footer: {
       about:
@@ -538,6 +562,18 @@ export const dict = {
       fillAll: "Completa todos los campos.",
       shortPassword: "La contraseña debe tener al menos 6 caracteres.",
       profile: "Tus datos",
+      forgot: "¿Olvidaste tu contraseña?",
+      forgotTitle: "Restablecer contraseña",
+      forgotIntro:
+        "Introduce tu correo y te enviaremos un enlace para restablecer tu contraseña.",
+      sendLink: "Enviar enlace",
+      resetSent:
+        "Si este correo tiene una cuenta, te enviamos un enlace para restablecer la contraseña. Revisa tu bandeja (y el spam).",
+      resetTitle: "Establecer nueva contraseña",
+      newPassword: "Nueva contraseña",
+      resetBtn: "Guardar nueva contraseña",
+      invalidToken: "Enlace no válido o caducado. Solicita uno nuevo.",
+      backToLogin: "Volver a iniciar sesión",
     },
     footer: {
       about:
@@ -722,6 +758,18 @@ export const dict = {
       fillAll: "Vul alle velden in.",
       shortPassword: "Wachtwoord moet minimaal 6 tekens bevatten.",
       profile: "Jouw gegevens",
+      forgot: "Wachtwoord vergeten?",
+      forgotTitle: "Wachtwoord resetten",
+      forgotIntro:
+        "Voer je e-mail in en we sturen je een link om je wachtwoord te resetten.",
+      sendLink: "Link versturen",
+      resetSent:
+        "Als dit e-mailadres een account heeft, hebben we een reset-link gestuurd. Controleer je inbox (en spam).",
+      resetTitle: "Nieuw wachtwoord instellen",
+      newPassword: "Nieuw wachtwoord",
+      resetBtn: "Nieuw wachtwoord opslaan",
+      invalidToken: "Ongeldige of verlopen link. Vraag een nieuwe aan.",
+      backToLogin: "Terug naar inloggen",
     },
     footer: {
       about:

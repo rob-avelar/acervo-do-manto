@@ -7,49 +7,9 @@ import { getServerLang } from "@/lib/lang-server";
 import { getServerCurrency } from "@/lib/currency-server";
 import { formatMoney } from "@/lib/currency";
 import { dict } from "@/lib/i18n";
+import { statusLabel, STATUS_COLORS } from "@/lib/order-status";
 
 export const dynamic = "force-dynamic";
-
-const STATUS_LABELS: Record<
-  string,
-  { pt: string; en: string; es: string; nl: string }
-> = {
-  PENDING: {
-    pt: "Aguardando pagamento",
-    en: "Awaiting payment",
-    es: "Esperando pago",
-    nl: "Wacht op betaling",
-  },
-  PAID: { pt: "Pago", en: "Paid", es: "Pagado", nl: "Betaald" },
-  PROCESSING: {
-    pt: "Em preparação",
-    en: "Processing",
-    es: "En preparación",
-    nl: "In verwerking",
-  },
-  SHIPPED: { pt: "Enviado", en: "Shipped", es: "Enviado", nl: "Verzonden" },
-  DELIVERED: {
-    pt: "Entregue",
-    en: "Delivered",
-    es: "Entregado",
-    nl: "Geleverd",
-  },
-  CANCELLED: {
-    pt: "Cancelado",
-    en: "Cancelled",
-    es: "Cancelado",
-    nl: "Geannuleerd",
-  },
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-amber-500/20 text-amber-300",
-  PAID: "bg-emerald-500/20 text-emerald-300",
-  PROCESSING: "bg-blue-500/20 text-blue-300",
-  SHIPPED: "bg-cyan-500/20 text-cyan-300",
-  DELIVERED: "bg-green-600/20 text-green-300",
-  CANCELLED: "bg-red-500/20 text-red-300",
-};
 
 export default async function AccountPage() {
   const customer = await getCurrentCustomer();
@@ -131,7 +91,7 @@ export default async function AccountPage() {
                       STATUS_COLORS[o.status] ?? "bg-gray-500/20 text-gray-300"
                     }`}
                   >
-                    {STATUS_LABELS[o.status]?.[lang] ?? o.status}
+                    {statusLabel(o.status, lang)}
                   </span>
                   <span className="font-semibold">
                     {formatMoney(o.totalCents, currency)}

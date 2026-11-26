@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionCustomerId } from "@/lib/auth";
 import { loginAction } from "../actions";
@@ -36,6 +37,14 @@ export default async function LoginPage() {
           },
         }}
       />
+      <p className="mt-4 text-center">
+        <Link
+          href="/conta/esqueci"
+          className="text-gray-400 hover:text-gold underline text-sm"
+        >
+          {a.forgot}
+        </Link>
+      </p>
     </div>
   );
 }

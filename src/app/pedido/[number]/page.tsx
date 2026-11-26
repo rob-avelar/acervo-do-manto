@@ -8,6 +8,12 @@ import { dict } from "@/lib/i18n";
 import { emailEnabled } from "@/lib/email";
 import { sizeLabel } from "@/lib/sizes";
 import { productName } from "@/lib/product-name";
+import {
+  STATUS_FLOW,
+  statusLabel,
+  TRACKING_LABEL,
+  type OrderStatusName,
+} from "@/lib/order-status";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +56,63 @@ export default async function OrderPage({
               : to.pendingNoEmail}
         </p>
       </div>
+
+      {/* Linha do tempo do andamento */}
+      {order.status !== "CANCELLED" && (
+        <div className="border border-ink-600 bg-ink-800 rounded-xl p-5 mb-4">
+          <div className="flex items-center justify-between">
+            {STATUS_FLOW.map((step, i) => {
+              const currentIdx = STATUS_FLOW.indexOf(
+                order.status as OrderStatusName,
+              );
+              const reached = currentIdx >= i && currentIdx >= 0;
+              return (
+                <div
+                  key={step}
+                  className="flex-1 flex flex-col items-center text-center relative"
+                >
+                  {i > 0 && (
+                    <span
+                      className={`absolute right-1/2 top-3 h-0.5 w-full -z-0 ${
+                        reached ? "bg-gold" : "bg-ink-600"
+                      }`}
+                    />
+                  )}
+                  <span
+                    className={`relative z-10 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      reached
+                        ? "bg-gold text-ink"
+                        : "bg-ink-600 text-gray-400"
+                    }`}
+                  >
+                    {reached ? "✓" : i + 1}
+                  </span>
+                  <span
+                    className={`mt-2 text-[0.7rem] ${
+                      reached ? "text-gold" : "text-gray-500"
+                    }`}
+                  >
+                    {statusLabel(step, lang)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          {order.trackingCode &&
+            (order.status === "SHIPPED" || order.status === "DELIVERED") && (
+              <p className="mt-4 text-sm text-center text-gray-300">
+                {TRACKING_LABEL[lang]}:{" "}
+                <strong className="text-gold">{order.trackingCode}</strong>
+              </p>
+            )}
+        </div>
+      )}
+
+      {order.status === "CANCELLED" && (
+        <div className="border border-red-500/40 bg-red-500/10 rounded-xl p-4 mb-4 text-center text-sm text-red-200">
+          {statusLabel("CANCELLED", lang)}
+        </div>
+      )}
 
       <div className="border border-ink-600 bg-ink-800 rounded-xl p-5 space-y-3">
         <h2 className="font-display text-lg font-bold">{to.items}</h2>

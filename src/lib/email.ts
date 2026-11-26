@@ -229,6 +229,41 @@ function statusCopy(
   }
 }
 
+/** Envia o e-mail com o link de redefinição de senha. */
+export async function sendPasswordReset(
+  to: string,
+  name: string,
+  link: string,
+  lang: "pt" | "en" | "es" | "nl",
+) {
+  if (!emailEnabled()) return;
+  const copy = {
+    pt: {
+      subject: "Redefinir sua senha — Acervo do Manto",
+      html: `<h2>Olá, ${name}!</h2><p>Recebemos um pedido para redefinir sua senha. Clique no botão abaixo (válido por 1 hora):</p><p><a href="${link}" style="display:inline-block;background:#d4af37;color:#111;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Redefinir senha</a></p><p>Se você não pediu isso, pode ignorar este e-mail.</p><p>— Acervo do Manto</p>`,
+    },
+    en: {
+      subject: "Reset your password — Acervo do Manto",
+      html: `<h2>Hi, ${name}!</h2><p>We received a request to reset your password. Click the button below (valid for 1 hour):</p><p><a href="${link}" style="display:inline-block;background:#d4af37;color:#111;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Reset password</a></p><p>If you didn't request this, you can ignore this email.</p><p>— Acervo do Manto</p>`,
+    },
+    es: {
+      subject: "Restablecer tu contraseña — Acervo do Manto",
+      html: `<h2>¡Hola, ${name}!</h2><p>Recibimos una solicitud para restablecer tu contraseña. Haz clic en el botón (válido 1 hora):</p><p><a href="${link}" style="display:inline-block;background:#d4af37;color:#111;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Restablecer contraseña</a></p><p>Si no lo solicitaste, puedes ignorar este correo.</p><p>— Acervo do Manto</p>`,
+    },
+    nl: {
+      subject: "Reset je wachtwoord — Acervo do Manto",
+      html: `<h2>Hoi, ${name}!</h2><p>We hebben een verzoek ontvangen om je wachtwoord te resetten. Klik op de knop (1 uur geldig):</p><p><a href="${link}" style="display:inline-block;background:#d4af37;color:#111;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Wachtwoord resetten</a></p><p>Heb je dit niet aangevraagd? Negeer deze e-mail.</p><p>— Acervo do Manto</p>`,
+    },
+  }[lang];
+
+  await getTransporter().sendMail({
+    from: fromAddress(),
+    to,
+    subject: copy.subject,
+    html: copy.html,
+  });
+}
+
 /** Envia e-mail ao cliente quando o status do pedido muda. */
 export async function sendStatusEmail(data: StatusEmailData) {
   if (!emailEnabled()) return;

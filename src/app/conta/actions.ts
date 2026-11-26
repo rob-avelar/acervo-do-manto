@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import {
@@ -7,9 +8,14 @@ import {
   verifyPassword,
   createSession,
   clearSession,
+  createResetToken,
+  verifyResetToken,
 } from "@/lib/auth";
+import { sendPasswordReset } from "@/lib/email";
+import { getServerLang } from "@/lib/lang-server";
 
 export type AuthState = { error?: string };
+export type ResetState = { error?: string; sent?: boolean };
 
 // Cria conta nova — ou "reivindica" uma conta de convidado criada num pedido
 // anterior com o mesmo e-mail (nesse caso só define a senha).
@@ -68,4 +74,61 @@ export async function loginAction(
 export async function logoutAction() {
   clearSession();
   redirect("/");
+}
+
+function siteOrigin() {
+  const h = headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "";
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  return `${proto}://${host}`;
+}
+
+// Pede o link de redefinição. Nunca revela se o e-mail existe (segurança).
+export async function requestResetAction(
+  _prev: ResetState,
+  formData: FormData,
+): Promise<ResetState> {
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
+  if (!email) return { error: "fillAll" };
+
+  const customer = await prisma.customer.findUnique({ where: { email } });
+  if (customer?.passwordHash) {
+    try {
+      const token = await createResetToken(customer.id);
+      const link = `${siteOrigin()}/conta/redefinir?token=${token}`;
+      await sendPasswordReset(
+        customer.email,
+        customer.name,
+        link,
+        getServerLang(),
+      );
+    } catch (e) {
+      console.error("Falha ao enviar e-mail de reset:", e);
+    }
+  }
+  // Sempre "enviado" (não vaza existência do e-mail)
+  return { sent: true };
+}
+
+export async function resetPasswordAction(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const token = String(formData.get("token") ?? "");
+  const password = String(formData.get("password") ?? "");
+  if (!password) return { error: "fillAll" };
+  if (password.length < 6) return { error: "shortPassword" };
+
+  const customerId = await verifyResetToken(token);
+  if (!customerId) return { error: "invalidToken" };
+
+  const passwordHash = await hashPassword(password);
+  await prisma.customer.update({
+    where: { id: customerId },
+    data: { passwordHash },
+  });
+  await createSession(customerId);
+  redirect("/conta");
 }

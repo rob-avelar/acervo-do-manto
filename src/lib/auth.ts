@@ -57,6 +57,26 @@ export async function getSessionCustomerId(): Promise<string | null> {
   }
 }
 
+/** Cria um token de redefinição de senha (válido por 1 hora). */
+export async function createResetToken(customerId: string) {
+  return new SignJWT({ sub: customerId, purpose: "reset" })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("1h")
+    .sign(SECRET);
+}
+
+/** Valida o token de redefinição e retorna o id do cliente (ou null). */
+export async function verifyResetToken(token: string): Promise<string | null> {
+  try {
+    const { payload } = await jwtVerify(token, SECRET);
+    if (payload.purpose !== "reset") return null;
+    return typeof payload.sub === "string" ? payload.sub : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Retorna o cliente logado (dados básicos) ou null. */
 export async function getCurrentCustomer() {
   const id = await getSessionCustomerId();
