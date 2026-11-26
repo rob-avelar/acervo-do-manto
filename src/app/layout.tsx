@@ -6,8 +6,7 @@ import "./globals.css";
 import { CartProvider } from "@/lib/cart";
 import { CartBadge } from "@/components/cart-badge";
 import { SearchBar } from "@/components/search-bar";
-import { LangSwitcher } from "@/components/lang-switcher";
-import { CurrencySwitcher } from "@/components/currency-switcher";
+import { PrefsMenu } from "@/components/prefs-menu";
 import { getServerLang } from "@/lib/lang-server";
 import { getServerCurrency } from "@/lib/currency-server";
 import { formatMoney, FREE_SHIPPING_CENTS } from "@/lib/currency";
@@ -93,10 +92,10 @@ export default function RootLayout({
                 </Link>
                 <CartBadge label={t.nav.cart} />
                 <span className="h-5 w-px bg-ink-600" aria-hidden />
-                <div className="flex items-center gap-3">
-                  <CurrencySwitcher />
-                  <LangSwitcher />
-                </div>
+                <PrefsMenu
+                  langHeader={lang === "pt" ? "Idioma" : "Language"}
+                  currencyHeader={lang === "pt" ? "Moeda" : "Currency"}
+                />
               </nav>
             </div>
           </header>
