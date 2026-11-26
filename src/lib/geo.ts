@@ -11,8 +11,8 @@ const EUROPE = new Set([
 export function currencyForCountry(country?: string | null): Currency {
   const c = (country ?? "").toUpperCase();
   if (c === "BR") return "BRL";
-  if (EUROPE.has(c)) return "EUR";
   if (c === "US") return "USD";
-  // padrão internacional
-  return "USD";
+  if (EUROPE.has(c)) return "EUR";
+  // padrão: euro (loja focada em Brasil + Europa)
+  return "EUR";
 }

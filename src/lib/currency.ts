@@ -89,6 +89,6 @@ export function effectiveCurrency(
   cur: Currency,
   lang: "pt" | "en",
 ): Currency {
-  if (lang === "en" && cur === "BRL") return "USD";
+  if (lang === "en" && cur === "BRL") return "EUR";
   return cur;
 }
