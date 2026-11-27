@@ -72,6 +72,7 @@ model Address {
   neighborhood String  @default("") // bairro (opcional fora do Brasil)
   city         String
   state        String // UF / estado / província
+  isDefault    Boolean @default(false) // endereço de entrega padrão do cliente
   orders       Order[]
   createdAt    DateTime @default(now())
 

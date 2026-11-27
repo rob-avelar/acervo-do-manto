@@ -36,7 +36,7 @@ export async function getCheckoutPrefill(): Promise<CheckoutPrefill | null> {
   if (!c) return null;
 
   const addr = await prisma.address.findFirst({
-    where: { customerId: c.id },
+    where: { customerId: c.id, isDefault: true },
     orderBy: { createdAt: "desc" },
     select: {
       country: true,
@@ -90,6 +90,7 @@ export type CheckoutInput = {
     state: string;
   };
   items: CheckoutItem[];
+  saveDefault?: boolean; // salvar este endereço como padrão do cliente
 };
 
 export type CheckoutResult =
@@ -179,8 +180,17 @@ async function persistOrder(input: CheckoutInput) {
       neighborhood: input.address.neighborhood.trim(),
       city: input.address.city.trim(),
       state: input.address.state.trim().toUpperCase(),
+      isDefault: Boolean(input.saveDefault),
     },
   });
+
+  // Se marcou como padrão, desmarca os outros endereços do cliente
+  if (input.saveDefault) {
+    await prisma.address.updateMany({
+      where: { customerId: customer.id, id: { not: address.id } },
+      data: { isDefault: false },
+    });
+  }
 
   const order = await prisma.order.create({
     data: {

@@ -131,6 +131,8 @@ export const dict = {
       customConsentError:
         "Para continuar, confirme que está ciente sobre os itens personalizados.",
       policyLink: "Ver Política de Trocas e Devoluções",
+      useDefaultAddress: "Utilizar o endereço de entrega padrão?",
+      saveAsDefault: "Salvar este endereço como padrão",
     },
     order: {
       confirmed: "Pedido confirmado!",
@@ -361,6 +363,8 @@ export const dict = {
       customConsentError:
         "Please confirm you understand the policy on personalized items to continue.",
       policyLink: "See Returns & Refunds Policy",
+      useDefaultAddress: "Use your default delivery address?",
+      saveAsDefault: "Save this address as default",
     },
     order: {
       confirmed: "Order confirmed!",
@@ -592,6 +596,8 @@ export const dict = {
       customConsentError:
         "Para continuar, confirma que entiendes la política de artículos personalizados.",
       policyLink: "Ver Política de Devoluciones",
+      useDefaultAddress: "¿Usar tu dirección de entrega predeterminada?",
+      saveAsDefault: "Guardar esta dirección como predeterminada",
     },
     order: {
       confirmed: "¡Pedido confirmado!",
@@ -822,6 +828,8 @@ export const dict = {
       customConsentError:
         "Bevestig dat je het beleid voor gepersonaliseerde artikelen begrijpt om door te gaan.",
       policyLink: "Bekijk retour- en terugbetalingsbeleid",
+      useDefaultAddress: "Standaard bezorgadres gebruiken?",
+      saveAsDefault: "Dit adres als standaard opslaan",
     },
     order: {
       confirmed: "Bestelling bevestigd!",

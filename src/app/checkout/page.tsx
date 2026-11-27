@@ -26,6 +26,19 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [cepLoading, setCepLoading] = useState(false);
   const [consent, setConsent] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [saveDefault, setSaveDefault] = useState(false);
+  const [useDefault, setUseDefault] = useState(true);
+  const [defaultAddr, setDefaultAddr] = useState<null | {
+    country: string;
+    cep: string;
+    street: string;
+    number: string;
+    complement: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+  }>(null);
 
   // Há algum item personalizado (nome/número/patch) no carrinho?
   const hasCustomization = items.some(
@@ -57,33 +70,46 @@ export default function CheckoutPage() {
     setForm((f) => (f.country === def ? f : { ...f, country: def }));
   }, [currency, countryTouched]);
 
-  // Pré-preenche dados do cliente logado + último endereço (editável)
+  // Pré-preenche dados do cliente logado + endereço padrão (editável)
   useEffect(() => {
     getCheckoutPrefill().then((me) => {
       if (!me) return;
+      setLoggedIn(true);
       setForm((f) => ({
         ...f,
         name: f.name || me.name,
         email: f.email || me.email,
         phone: f.phone || me.phone,
-        ...(me.address
-          ? {
-              country: me.address.country || f.country,
-              cep: f.cep || me.address.cep,
-              street: f.street || me.address.street,
-              number: f.number || me.address.number,
-              complement: f.complement || me.address.complement,
-              neighborhood: f.neighborhood || me.address.neighborhood,
-              city: f.city || me.address.city,
-              state: f.state || me.address.state,
-            }
-          : {}),
       }));
-      // Se temos um endereço salvo com país, fixa o país (não deixa a moeda sobrescrever)
-      if (me.address?.country) setCountryTouched(true);
+      if (me.address) {
+        setDefaultAddr(me.address);
+        // Pré-marca "usar padrão" e preenche o endereço
+        setForm((f) => ({ ...f, ...me.address }));
+        setCountryTouched(true);
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Alterna entre usar o endereço padrão (preenche) ou digitar outro (limpa)
+  function toggleUseDefault(use: boolean) {
+    setUseDefault(use);
+    if (use && defaultAddr) {
+      setForm((f) => ({ ...f, ...defaultAddr }));
+      setCountryTouched(true);
+    } else {
+      setForm((f) => ({
+        ...f,
+        cep: "",
+        street: "",
+        number: "",
+        complement: "",
+        neighborhood: "",
+        city: "",
+        state: "",
+      }));
+    }
+  }
 
   const isBrazil = form.country === "BR";
 
@@ -153,6 +179,8 @@ export default function CheckoutPage() {
         priceCents: i.priceCents,
         customization: i.customization,
       })),
+      // Salva como padrão se marcou, ou se usou o padrão existente (reafirma)
+      saveDefault: loggedIn && (saveDefault || (useDefault && !!defaultAddr)),
     };
 
     // Fora do Brasil → pagamento online via Stripe. Brasil → fluxo manual.
@@ -236,6 +264,19 @@ export default function CheckoutPage() {
           {/* Endereço */}
           <fieldset className="space-y-3">
             <legend className="font-bold mb-2">{t.addressTitle}</legend>
+
+            {/* Usar endereço padrão (cliente logado com endereço salvo) */}
+            {loggedIn && defaultAddr && (
+              <label className="flex items-center gap-2 text-sm text-gray-200 bg-ink-800 border border-ink-600 rounded-lg px-3 py-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={useDefault}
+                  onChange={(e) => toggleUseDefault(e.target.checked)}
+                  className="h-4 w-4 accent-gold"
+                />
+                {t.useDefaultAddress}
+              </label>
+            )}
 
             {/* País */}
             <select
@@ -360,6 +401,19 @@ export default function CheckoutPage() {
                   onChange={(e) => set("cep", e.target.value)}
                 />
               </>
+            )}
+
+            {/* Salvar este endereço como padrão (logado, ao digitar/editar) */}
+            {loggedIn && (!defaultAddr || !useDefault) && (
+              <label className="flex items-center gap-2 text-sm text-gray-200 cursor-pointer pt-1">
+                <input
+                  type="checkbox"
+                  checked={saveDefault}
+                  onChange={(e) => setSaveDefault(e.target.checked)}
+                  className="h-4 w-4 accent-gold"
+                />
+                {t.saveAsDefault}
+              </label>
             )}
           </fieldset>
 
