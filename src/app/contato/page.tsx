@@ -21,7 +21,13 @@ export default async function ContactPage() {
         labels={{
           name: c.name,
           email: c.email,
+          subject: c.subject,
+          subjectGeneral: c.subjectGeneral,
+          subjectOrder: c.subjectOrder,
+          subjectExchange: c.subjectExchange,
+          subjectOther: c.subjectOther,
           orderNumber: c.orderNumber,
+          orderNumberReq: c.orderNumberReq,
           message: c.message,
           send: c.send,
           sent: c.sent,
@@ -29,6 +35,7 @@ export default async function ContactPage() {
             fillAll: c.fillAll,
             badEmail: c.badEmail,
             sendFail: c.sendFail,
+            orderRequired: c.orderRequired,
           },
         }}
       />

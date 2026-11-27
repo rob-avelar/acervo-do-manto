@@ -204,6 +204,14 @@ export const dict = {
       fillAll: "Preencha nome, e-mail e mensagem.",
       badEmail: "E-mail inválido.",
       sendFail: "Não foi possível enviar agora. Tente novamente mais tarde.",
+      subject: "Assunto",
+      subjectGeneral: "Dúvida geral",
+      subjectOrder: "Sobre um pedido",
+      subjectExchange: "Troca ou devolução",
+      subjectOther: "Outro",
+      orderNumberReq: "Número do pedido",
+      orderRequired:
+        "Para mensagens sobre um pedido, informe o número do pedido.",
     },
     footer: {
       about:
@@ -422,6 +430,14 @@ export const dict = {
       fillAll: "Please fill in name, email and message.",
       badEmail: "Invalid email.",
       sendFail: "Couldn't send right now. Please try again later.",
+      subject: "Subject",
+      subjectGeneral: "General question",
+      subjectOrder: "About an order",
+      subjectExchange: "Exchange or return",
+      subjectOther: "Other",
+      orderNumberReq: "Order number",
+      orderRequired:
+        "For messages about an order, please provide the order number.",
     },
     footer: {
       about:
@@ -640,6 +656,14 @@ export const dict = {
       fillAll: "Completa nombre, correo y mensaje.",
       badEmail: "Correo no válido.",
       sendFail: "No se pudo enviar ahora. Inténtalo más tarde.",
+      subject: "Asunto",
+      subjectGeneral: "Consulta general",
+      subjectOrder: "Sobre un pedido",
+      subjectExchange: "Cambio o devolución",
+      subjectOther: "Otro",
+      orderNumberReq: "Número de pedido",
+      orderRequired:
+        "Para mensajes sobre un pedido, indica el número de pedido.",
     },
     footer: {
       about:
@@ -858,6 +882,14 @@ export const dict = {
       fillAll: "Vul naam, e-mail en bericht in.",
       badEmail: "Ongeldig e-mailadres.",
       sendFail: "Kon nu niet verzenden. Probeer het later opnieuw.",
+      subject: "Onderwerp",
+      subjectGeneral: "Algemene vraag",
+      subjectOrder: "Over een bestelling",
+      subjectExchange: "Ruilen of retourneren",
+      subjectOther: "Overig",
+      orderNumberReq: "Bestelnummer",
+      orderRequired:
+        "Voor berichten over een bestelling, geef het bestelnummer op.",
     },
     footer: {
       about:

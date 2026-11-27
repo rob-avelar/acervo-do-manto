@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { sendContactAction, type ContactState } from "@/app/contato/actions";
 
@@ -19,20 +20,28 @@ function SubmitButton({ label }: { label: string }) {
   );
 }
 
+export type ContactLabels = {
+  name: string;
+  email: string;
+  subject: string;
+  subjectGeneral: string;
+  subjectOrder: string;
+  subjectExchange: string;
+  subjectOther: string;
+  orderNumber: string; // label quando opcional
+  orderNumberReq: string; // label quando obrigatório
+  message: string;
+  send: string;
+  sent: string;
+  errors: Record<string, string>;
+};
+
 export function ContactForm({
   labels,
   defaultName = "",
   defaultEmail = "",
 }: {
-  labels: {
-    name: string;
-    email: string;
-    orderNumber: string;
-    message: string;
-    send: string;
-    sent: string;
-    errors: Record<string, string>;
-  };
+  labels: ContactLabels;
   defaultName?: string;
   defaultEmail?: string;
 }) {
@@ -40,6 +49,10 @@ export function ContactForm({
     sendContactAction,
     {},
   );
+  const [subject, setSubject] = useState("general");
+
+  // Pedido obrigatório quando o assunto for sobre um pedido / troca
+  const orderRequired = subject === "order" || subject === "exchange";
 
   if (state?.sent) {
     return (
@@ -82,9 +95,32 @@ export function ContactForm({
       </div>
       <div>
         <label className="block text-sm text-gray-300 mb-1">
-          {labels.orderNumber}
+          {labels.subject}
         </label>
-        <input name="orderNumber" type="text" className={inputCls} />
+        <select
+          name="subject"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          className={inputCls}
+        >
+          <option value="general">{labels.subjectGeneral}</option>
+          <option value="order">{labels.subjectOrder}</option>
+          <option value="exchange">{labels.subjectExchange}</option>
+          <option value="other">{labels.subjectOther}</option>
+        </select>
+      </div>
+      <div>
+        <label className="block text-sm text-gray-300 mb-1">
+          {orderRequired ? labels.orderNumberReq : labels.orderNumber}
+          {orderRequired && <span className="text-gold"> *</span>}
+        </label>
+        <input
+          name="orderNumber"
+          type="text"
+          required={orderRequired}
+          placeholder="AM-..."
+          className={inputCls}
+        />
       </div>
       <div>
         <label className="block text-sm text-gray-300 mb-1">

@@ -235,6 +235,7 @@ export async function sendContactEmail(data: {
   email: string;
   orderNumber?: string;
   message: string;
+  subject?: string;
 }) {
   if (!emailEnabled()) return;
   const to = process.env.OWNER_EMAIL || process.env.SMTP_USER;
@@ -244,12 +245,13 @@ export async function sendContactEmail(data: {
     from: fromAddress(),
     to,
     replyTo: data.email, // responder vai direto para o cliente
-    subject: `📨 Contato: ${data.name}${
+    subject: `📨 ${data.subject || "Contato"}: ${data.name}${
       data.orderNumber ? ` — Pedido ${data.orderNumber}` : ""
     }`,
     html: `<h2>Nova mensagem de contato</h2>
 <p><strong>Nome:</strong> ${data.name}</p>
 <p><strong>E-mail:</strong> ${data.email}</p>
+${data.subject ? `<p><strong>Assunto:</strong> ${data.subject}</p>` : ""}
 ${data.orderNumber ? `<p><strong>Pedido:</strong> ${data.orderNumber}</p>` : ""}
 <p><strong>Mensagem:</strong></p>
 <p>${data.message.replace(/\n/g, "<br>")}</p>`,
