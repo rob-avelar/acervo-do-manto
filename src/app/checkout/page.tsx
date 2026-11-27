@@ -60,13 +60,22 @@ export default function CheckoutPage() {
     state: "",
   });
 
-  // País padrão conforme a moeda detectada — acompanha a moeda enquanto o
-  // cliente não escolher o país manualmente.
+  // País padrão: primeiro pelo IP do cliente (cookie "cc" do middleware),
+  // senão pela moeda detectada. Enquanto o cliente não escolher manualmente.
   const [countryTouched, setCountryTouched] = useState(false);
   useEffect(() => {
     if (countryTouched) return;
+    const SUPPORTED = [
+      "BR", "PT", "ES", "FR", "DE", "IT", "GB", "IE", "NL", "US", "CA",
+    ];
+    const m =
+      typeof document !== "undefined"
+        ? document.cookie.match(/(?:^|;\s*)cc=([A-Za-z]{2})/)
+        : null;
+    const geo = m ? m[1].toUpperCase() : null;
     const def =
-      currency === "BRL" ? "BR" : currency === "EUR" ? "PT" : "US";
+      (geo && (SUPPORTED.includes(geo) ? geo : "OT")) ||
+      (currency === "BRL" ? "BR" : currency === "EUR" ? "PT" : "US");
     setForm((f) => (f.country === def ? f : { ...f, country: def }));
   }, [currency, countryTouched]);
 

@@ -28,6 +28,12 @@ export function middleware(req: NextRequest) {
     maxAge: 60 * 60 * 24 * 30,
     sameSite: "lax",
   });
+  // País detectado pelo IP (usado para pré-selecionar o país no checkout).
+  res.cookies.set("cc", country, {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30,
+    sameSite: "lax",
+  });
   // Idioma padrão pelo país — só se o usuário ainda não escolheu.
   if (!req.cookies.get("lang")) {
     res.cookies.set("lang", langForCountry(country), {
