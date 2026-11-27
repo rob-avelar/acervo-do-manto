@@ -1,12 +1,13 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/currency";
+import { updateOrder } from "./actions";
+import type { OrderStatus, Prisma } from "@prisma/client";
+
+export const dynamic = "force-dynamic";
 
 // Valores exibidos em euro no admin (armazenados em centavos de BRL).
 const eur = (cents: number) => formatMoney(cents, "EUR");
-import { updateOrder } from "./actions";
-import type { OrderStatus } from "@prisma/client";
-
-export const dynamic = "force-dynamic";
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   PENDING: "Aguardando pagamento",
@@ -26,32 +27,109 @@ const STATUS_COLORS: Record<OrderStatus, string> = {
   CANCELLED: "bg-red-500/20 text-red-300",
 };
 
-export default async function AdminOrdersPage() {
-  const orders = await prisma.order.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      customer: true,
-      address: true,
-      items: { include: { product: true } },
-    },
-  });
+const PER_PAGE = 20;
 
-  const pending = orders.filter(
-    (o) => o.status === "PAID" || o.status === "PROCESSING",
-  ).length;
+export default async function AdminOrdersPage({
+  searchParams,
+}: {
+  searchParams: { q?: string; status?: string; pagina?: string };
+}) {
+  const q = (searchParams.q ?? "").trim();
+  const statusFilter = (
+    STATUS_LABELS[searchParams.status as OrderStatus] ? searchParams.status : ""
+  ) as OrderStatus | "";
+  const page = Math.max(1, Number(searchParams.pagina ?? "1") || 1);
+
+  const where: Prisma.OrderWhereInput = {};
+  if (statusFilter) where.status = statusFilter;
+  if (q) {
+    where.OR = [
+      { number: { contains: q, mode: "insensitive" } },
+      { customer: { is: { name: { contains: q, mode: "insensitive" } } } },
+      { customer: { is: { email: { contains: q, mode: "insensitive" } } } },
+    ];
+  }
+
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PER_PAGE,
+      take: PER_PAGE,
+      include: {
+        customer: true,
+        address: true,
+        items: { include: { product: true } },
+      },
+    }),
+    prisma.order.count({ where }),
+  ]);
+
+  const pages = Math.max(1, Math.ceil(total / PER_PAGE));
+
+  const hrefFor = (p: number) => {
+    const sp = new URLSearchParams();
+    if (q) sp.set("q", q);
+    if (statusFilter) sp.set("status", statusFilter);
+    sp.set("pagina", String(p));
+    return `/admin/pedidos?${sp.toString()}`;
+  };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
-      <div className="flex items-baseline justify-between mb-6">
+    <div>
+      <div className="flex items-baseline justify-between mb-5 flex-wrap gap-2">
         <h1 className="font-display text-3xl font-bold">Pedidos</h1>
-        <p className="text-sm text-gray-400">
-          {orders.length} no total · {pending} para separar/enviar
-        </p>
+        <p className="text-sm text-gray-400">{total} no total</p>
       </div>
+
+      {/* Filtros */}
+      <form
+        method="get"
+        className="flex flex-wrap items-end gap-3 mb-6 bg-ink-800 border border-ink-600 rounded-xl p-3"
+      >
+        <label className="text-xs text-gray-400 flex-1 min-w-[12rem]">
+          Buscar (nº, nome ou e-mail)
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="AM-... / nome / email"
+            className="block mt-1 w-full rounded-lg border border-ink-600 bg-ink-700 text-white text-sm px-3 py-2"
+          />
+        </label>
+        <label className="text-xs text-gray-400">
+          Status
+          <select
+            name="status"
+            defaultValue={statusFilter}
+            className="block mt-1 rounded-lg border border-ink-600 bg-ink-700 text-white text-sm px-3 py-2"
+          >
+            <option value="">Todos</option>
+            {Object.entries(STATUS_LABELS).map(([v, label]) => (
+              <option key={v} value={v}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="submit"
+          className="rounded-lg bg-gold text-ink px-5 py-2 text-sm font-semibold hover:bg-gold-light"
+        >
+          Filtrar
+        </button>
+        {(q || statusFilter) && (
+          <Link
+            href="/admin/pedidos"
+            className="text-sm text-gray-400 hover:text-gold underline py-2"
+          >
+            Limpar
+          </Link>
+        )}
+      </form>
 
       {orders.length === 0 ? (
         <p className="text-gray-400 py-12 text-center">
-          Nenhum pedido ainda.
+          Nenhum pedido encontrado.
         </p>
       ) : (
         <div className="space-y-4">
@@ -78,10 +156,13 @@ export default async function AdminOrdersPage() {
               <div className="grid md:grid-cols-2 gap-4 text-sm">
                 {/* Cliente + entrega */}
                 <div>
-                  <p className="text-xs uppercase text-gray-500 mb-1">
-                    Cliente
-                  </p>
-                  <p className="font-medium">{o.customer.name}</p>
+                  <p className="text-xs uppercase text-gray-500 mb-1">Cliente</p>
+                  <Link
+                    href={`/admin/clientes/${o.customerId}`}
+                    className="font-medium text-white hover:text-gold underline"
+                  >
+                    {o.customer.name}
+                  </Link>
                   <p className="text-gray-400">{o.customer.email}</p>
                   {o.customer.phone && (
                     <p className="text-gray-400">📱 {o.customer.phone}</p>
@@ -132,16 +213,12 @@ export default async function AdminOrdersPage() {
                     <div className="flex justify-between text-gray-400">
                       <span>Frete</span>
                       <span>
-                        {o.shippingCents === 0
-                          ? "Grátis"
-                          : eur(o.shippingCents)}
+                        {o.shippingCents === 0 ? "Grátis" : eur(o.shippingCents)}
                       </span>
                     </div>
                     <div className="flex justify-between font-bold">
                       <span>Total</span>
-                      <span className="text-gold">
-                        {eur(o.totalCents)}
-                      </span>
+                      <span className="text-gold">{eur(o.totalCents)}</span>
                     </div>
                   </div>
                 </div>
@@ -168,7 +245,7 @@ export default async function AdminOrdersPage() {
                   </select>
                 </label>
                 <label className="text-xs text-gray-400 flex-1 min-w-[12rem]">
-                  Código de rastreio (Correios)
+                  Código de rastreio
                   <input
                     name="tracking"
                     defaultValue={o.trackingCode ?? ""}
@@ -185,6 +262,35 @@ export default async function AdminOrdersPage() {
               </form>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Paginação */}
+      {pages > 1 && (
+        <div className="flex items-center justify-center gap-4 mt-8">
+          {page > 1 ? (
+            <Link
+              href={hrefFor(page - 1)}
+              className="text-sm text-gold underline"
+            >
+              ← Anterior
+            </Link>
+          ) : (
+            <span className="text-sm text-gray-600">← Anterior</span>
+          )}
+          <span className="text-sm text-gray-400">
+            Página {page} de {pages}
+          </span>
+          {page < pages ? (
+            <Link
+              href={hrefFor(page + 1)}
+              className="text-sm text-gold underline"
+            >
+              Próxima →
+            </Link>
+          ) : (
+            <span className="text-sm text-gray-600">Próxima →</span>
+          )}
         </div>
       )}
     </div>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/currency";
 
@@ -65,7 +66,14 @@ export default async function AdminClientes() {
                   key={c.id}
                   className="border-b border-ink-600 last:border-0 hover:bg-ink-700/40"
                 >
-                  <td className="px-4 py-3 font-medium text-white">{c.name}</td>
+                  <td className="px-4 py-3 font-medium text-white">
+                    <Link
+                      href={`/admin/clientes/${c.id}`}
+                      className="hover:text-gold underline"
+                    >
+                      {c.name}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3 text-gray-300">
                     {c.email}
                     {c.phone ? (

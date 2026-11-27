@@ -10,9 +10,14 @@ const eur = (c: number) => formatMoney(c, "EUR");
 // Status que contam como "pago" (receita confirmada)
 const PAID_STATUSES = ["PAID", "PROCESSING", "SHIPPED", "DELIVERED"] as const;
 
+const DAYS = 14;
+
 export default async function AdminDashboard() {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const since = new Date(now);
+  since.setDate(since.getDate() - (DAYS - 1));
+  since.setHours(0, 0, 0, 0);
 
   const [
     revenueAll,
@@ -21,6 +26,7 @@ export default async function AdminDashboard() {
     customersCount,
     byStatus,
     recent,
+    salesRaw,
   ] = await Promise.all([
     prisma.order.aggregate({
       _sum: { totalCents: true },
@@ -38,7 +44,32 @@ export default async function AdminDashboard() {
       take: 8,
       include: { customer: { select: { name: true } } },
     }),
+    prisma.order.findMany({
+      where: {
+        status: { in: [...PAID_STATUSES] },
+        createdAt: { gte: since },
+      },
+      select: { createdAt: true, totalCents: true },
+    }),
   ]);
+
+  // Série diária de faturamento (últimos DAYS dias)
+  const buckets: { label: string; cents: number }[] = [];
+  for (let i = 0; i < DAYS; i++) {
+    const d = new Date(since);
+    d.setDate(since.getDate() + i);
+    buckets.push({
+      label: `${d.getDate()}/${d.getMonth() + 1}`,
+      cents: 0,
+    });
+  }
+  salesRaw.forEach((o) => {
+    const d = new Date(o.createdAt);
+    d.setHours(0, 0, 0, 0);
+    const idx = Math.round((d.getTime() - since.getTime()) / 86400000);
+    if (idx >= 0 && idx < DAYS) buckets[idx].cents += o.totalCents;
+  });
+  const maxCents = Math.max(1, ...buckets.map((b) => b.cents));
 
   const statusCount: Record<string, number> = {};
   byStatus.forEach((s) => (statusCount[s.status] = s._count._all));
@@ -79,6 +110,32 @@ export default async function AdminDashboard() {
             <p className="text-2xl font-bold text-gold mt-1">{c.value}</p>
           </div>
         ))}
+      </div>
+
+      {/* Gráfico de vendas (últimos 14 dias) */}
+      <h2 className="font-display text-lg font-bold mb-3">
+        Vendas (últimos {DAYS} dias)
+      </h2>
+      <div className="rounded-xl border border-ink-600 bg-ink-800 p-4 mb-8">
+        <div className="flex items-end gap-1.5 h-40">
+          {buckets.map((b, i) => (
+            <div
+              key={i}
+              className="flex-1 flex flex-col items-center justify-end h-full group"
+            >
+              <div className="text-[0.6rem] text-gray-400 mb-1 opacity-0 group-hover:opacity-100 whitespace-nowrap">
+                {eur(b.cents)}
+              </div>
+              <div
+                className="w-full rounded-t bg-gold/80 group-hover:bg-gold transition-all min-h-[2px]"
+                style={{ height: `${(b.cents / maxCents) * 100}%` }}
+              />
+              <div className="text-[0.55rem] text-gray-500 mt-1 whitespace-nowrap">
+                {b.label}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Pedidos por status */}
