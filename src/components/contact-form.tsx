@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
-import { sendContactAction, type ContactState } from "@/app/contato/actions";
+import { sendContactAction, type ContactState } from "@/app/(store)/contato/actions";
 
 const inputCls =
   "w-full rounded-lg bg-ink border border-ink-600 px-3 py-2.5 text-sm focus:border-gold outline-none";

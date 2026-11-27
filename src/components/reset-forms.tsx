@@ -7,7 +7,7 @@ import {
   resetPasswordAction,
   type ResetState,
   type AuthState,
-} from "@/app/conta/actions";
+} from "@/app/(store)/conta/actions";
 
 const inputCls =
   "w-full rounded-lg bg-ink border border-ink-600 px-3 py-2.5 text-sm focus:border-gold outline-none";

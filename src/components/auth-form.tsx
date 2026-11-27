@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
-import type { AuthState } from "@/app/conta/actions";
+import type { AuthState } from "@/app/(store)/conta/actions";
 
 export type AuthLabels = {
   name: string;
