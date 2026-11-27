@@ -115,7 +115,7 @@ export default function RootLayout({
                   {t.footer.about}
                 </p>
                 <a
-                  href="https://instagram.com/acervodomanto"
+                  href="https://instagram.com/acervodomanto_"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
@@ -133,7 +133,7 @@ export default function RootLayout({
                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37Z" />
                     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                   </svg>
-                  <span className="text-sm">@acervodomanto</span>
+                  <span className="text-sm">@acervodomanto_</span>
                 </a>
               </div>
               <div>
