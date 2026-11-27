@@ -10,7 +10,11 @@ import { useLang } from "@/lib/use-lang";
 import { dict } from "@/lib/i18n";
 import { sizeLabel } from "@/lib/sizes";
 import { customizationLabel } from "@/lib/customization";
-import { createOrder, createStripeCheckout } from "./actions";
+import {
+  createOrder,
+  createStripeCheckout,
+  getCheckoutPrefill,
+} from "./actions";
 
 export default function CheckoutPage() {
   const { items, subtotalCents, clear } = useCart();
@@ -52,6 +56,20 @@ export default function CheckoutPage() {
       currency === "BRL" ? "BR" : currency === "EUR" ? "PT" : "US";
     setForm((f) => (f.country === def ? f : { ...f, country: def }));
   }, [currency, countryTouched]);
+
+  // Pré-preenche nome/e-mail/telefone se o cliente estiver logado (editável)
+  useEffect(() => {
+    getCheckoutPrefill().then((me) => {
+      if (!me) return;
+      setForm((f) => ({
+        ...f,
+        name: f.name || me.name,
+        email: f.email || me.email,
+        phone: f.phone || me.phone,
+      }));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isBrazil = form.country === "BR";
 

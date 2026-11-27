@@ -4,6 +4,7 @@ import type Stripe from "stripe";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { getStripe, hasStripe } from "@/lib/stripe";
+import { getCurrentCustomer } from "@/lib/auth";
 import { sendOrderEmails } from "@/lib/email";
 import { targetCents, type Currency } from "@/lib/currency";
 import {
@@ -11,6 +12,17 @@ import {
   customizationLabel,
   type Customization,
 } from "@/lib/customization";
+
+// Dados do cliente logado para pré-preencher o checkout (ou null).
+export async function getCheckoutPrefill(): Promise<{
+  name: string;
+  email: string;
+  phone: string;
+} | null> {
+  const c = await getCurrentCustomer();
+  if (!c) return null;
+  return { name: c.name ?? "", email: c.email ?? "", phone: c.phone ?? "" };
+}
 
 export type CheckoutItem = {
   productId: string;
