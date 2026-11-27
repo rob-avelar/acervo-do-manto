@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { formatBRL } from "@/lib/currency";
+import { formatMoney } from "@/lib/currency";
+
+// Valores exibidos em euro no admin (armazenados em centavos de BRL).
+const eur = (cents: number) => formatMoney(cents, "EUR");
 import { updateOrder } from "./actions";
 import type { OrderStatus } from "@prisma/client";
 
@@ -120,7 +123,7 @@ export default async function AdminOrdersPage() {
                           )}
                         </span>
                         <span className="whitespace-nowrap text-gray-400">
-                          {formatBRL((it.priceCents + it.extraCents) * it.quantity)}
+                          {eur((it.priceCents + it.extraCents) * it.quantity)}
                         </span>
                       </li>
                     ))}
@@ -131,13 +134,13 @@ export default async function AdminOrdersPage() {
                       <span>
                         {o.shippingCents === 0
                           ? "Grátis"
-                          : formatBRL(o.shippingCents)}
+                          : eur(o.shippingCents)}
                       </span>
                     </div>
                     <div className="flex justify-between font-bold">
                       <span>Total</span>
                       <span className="text-gold">
-                        {formatBRL(o.totalCents)}
+                        {eur(o.totalCents)}
                       </span>
                     </div>
                   </div>
