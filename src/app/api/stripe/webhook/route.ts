@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import { sendOrderEmailsByNumber } from "@/lib/notify";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,12 +28,16 @@ export async function POST(req: NextRequest) {
     const session = event.data.object as { metadata?: { orderNumber?: string } };
     const orderNumber = session.metadata?.orderNumber;
     if (orderNumber) {
-      await prisma.order
-        .update({
+      try {
+        await prisma.order.update({
           where: { number: orderNumber },
           data: { status: "PAID", paymentMethod: "stripe" },
-        })
-        .catch((e) => console.error("Pedido não encontrado:", orderNumber, e));
+        });
+        // Agora que está pago, envia a confirmação ao cliente + aviso ao dono
+        await sendOrderEmailsByNumber(orderNumber);
+      } catch (e) {
+        console.error("Erro ao processar pedido pago:", orderNumber, e);
+      }
     }
   }
 
