@@ -21,6 +21,12 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cepLoading, setCepLoading] = useState(false);
+  const [consent, setConsent] = useState(false);
+
+  // Há algum item personalizado (nome/número/patch) no carrinho?
+  const hasCustomization = items.some(
+    (i) => i.extraCents > 0 || Boolean(i.customization),
+  );
 
   const [form, setForm] = useState({
     name: "",
@@ -82,6 +88,13 @@ export default function CheckoutPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    // Itens personalizados exigem consentimento (não têm direito a devolução)
+    if (hasCustomization && !consent) {
+      setError(t.customConsentError);
+      return;
+    }
+
     setLoading(true);
 
     const payload = {
@@ -370,14 +383,38 @@ export default function CheckoutPage() {
             </div>
           </div>
 
+          {hasCustomization && (
+            <div className="mt-4 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3">
+              <p className="text-xs text-amber-200 leading-relaxed">
+                {t.customNotice}
+              </p>
+              <label className="mt-3 flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 accent-gold shrink-0"
+                />
+                <span className="text-xs text-gray-200">{t.customConsent}</span>
+              </label>
+              <Link
+                href="/trocas"
+                target="_blank"
+                className="mt-2 inline-block text-xs text-gold underline"
+              >
+                {t.policyLink}
+              </Link>
+            </div>
+          )}
+
           {error && (
             <p className="mt-3 text-sm text-red-400">{error}</p>
           )}
 
           <button
             type="submit"
-            disabled={loading}
-            className="mt-4 w-full rounded-lg bg-gold text-ink py-3 font-semibold hover:bg-gold-light transition-colors disabled:opacity-50"
+            disabled={loading || (hasCustomization && !consent)}
+            className="mt-4 w-full rounded-lg bg-gold text-ink py-3 font-semibold hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading
               ? t.processing

@@ -156,6 +156,11 @@ export default function RootLayout({
                     <li key={h}>{h}</li>
                   ))}
                   <li>{t.footer.freeShipping(freeShipAmt)}</li>
+                  <li>
+                    <Link href="/trocas" className="hover:text-white">
+                      {t.checkout.policyLink}
+                    </Link>
+                  </li>
                 </ul>
               </div>
             </div>

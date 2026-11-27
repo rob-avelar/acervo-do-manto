@@ -124,6 +124,13 @@ export const dict = {
       confirm: "Confirmar pedido",
       payCard: "Pagar com cartão",
       processing: "Processando...",
+      customNotice:
+        "⚠️ Itens personalizados (nome, número ou patch) são feitos sob sua especificação e, por lei (art. 16(c) da Diretiva UE 2011/83), não podem ser cancelados nem devolvidos após a confirmação — exceto em caso de defeito ou erro nosso.",
+      customConsent:
+        "Entendo e aceito que os itens personalizados do meu pedido não têm direito a cancelamento ou devolução.",
+      customConsentError:
+        "Para continuar, confirme que está ciente sobre os itens personalizados.",
+      policyLink: "Ver Política de Trocas e Devoluções",
     },
     order: {
       confirmed: "Pedido confirmado!",
@@ -320,6 +327,13 @@ export const dict = {
       confirm: "Place order",
       payCard: "Pay by card",
       processing: "Processing...",
+      customNotice:
+        "⚠️ Personalized items (name, number or patch) are made to your specification and, by law (Art. 16(c) of EU Directive 2011/83), cannot be cancelled or returned after confirmation — except in case of a defect or our error.",
+      customConsent:
+        "I understand and accept that the personalized items in my order are not eligible for cancellation or return.",
+      customConsentError:
+        "Please confirm you understand the policy on personalized items to continue.",
+      policyLink: "See Returns & Refunds Policy",
     },
     order: {
       confirmed: "Order confirmed!",
@@ -517,6 +531,13 @@ export const dict = {
       confirm: "Confirmar pedido",
       payCard: "Pagar con tarjeta",
       processing: "Procesando...",
+      customNotice:
+        "⚠️ Los artículos personalizados (nombre, número o parche) se fabrican según tu especificación y, por ley (art. 16(c) de la Directiva UE 2011/83), no pueden cancelarse ni devolverse tras la confirmación — salvo defecto o error nuestro.",
+      customConsent:
+        "Entiendo y acepto que los artículos personalizados de mi pedido no tienen derecho a cancelación ni devolución.",
+      customConsentError:
+        "Para continuar, confirma que entiendes la política de artículos personalizados.",
+      policyLink: "Ver Política de Devoluciones",
     },
     order: {
       confirmed: "¡Pedido confirmado!",
@@ -713,6 +734,13 @@ export const dict = {
       confirm: "Bestelling plaatsen",
       payCard: "Betaal met kaart",
       processing: "Bezig...",
+      customNotice:
+        "⚠️ Gepersonaliseerde artikelen (naam, nummer of badge) worden op jouw specificatie gemaakt en kunnen volgens de wet (art. 16(c) EU-richtlijn 2011/83) na bevestiging niet worden geannuleerd of geretourneerd — behalve bij een defect of onze fout.",
+      customConsent:
+        "Ik begrijp en accepteer dat de gepersonaliseerde artikelen in mijn bestelling niet in aanmerking komen voor annulering of retour.",
+      customConsentError:
+        "Bevestig dat je het beleid voor gepersonaliseerde artikelen begrijpt om door te gaan.",
+      policyLink: "Bekijk retour- en terugbetalingsbeleid",
     },
     order: {
       confirmed: "Bestelling bevestigd!",
