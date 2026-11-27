@@ -48,14 +48,22 @@ export default async function AccountPage() {
           </h1>
           <p className="text-gray-400 text-sm mt-1">{customer.email}</p>
         </div>
-        <form action={logoutAction}>
-          <button
-            type="submit"
+        <div className="flex items-center gap-4">
+          <Link
+            href="/contato"
             className="text-sm text-gray-300 hover:text-gold underline"
           >
-            {a.logout}
-          </button>
-        </form>
+            {dict[lang].contact.nav}
+          </Link>
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              className="text-sm text-gray-300 hover:text-gold underline"
+            >
+              {a.logout}
+            </button>
+          </form>
+        </div>
       </div>
 
       <h2 className="font-display text-xl font-bold mb-4">{a.myOrders}</h2>

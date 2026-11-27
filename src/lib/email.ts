@@ -229,6 +229,33 @@ function statusCopy(
   }
 }
 
+/** Envia uma mensagem de contato do cliente para o suporte/dono. */
+export async function sendContactEmail(data: {
+  name: string;
+  email: string;
+  orderNumber?: string;
+  message: string;
+}) {
+  if (!emailEnabled()) return;
+  const to = process.env.OWNER_EMAIL || process.env.SMTP_USER;
+  if (!to) return;
+
+  await getTransporter().sendMail({
+    from: fromAddress(),
+    to,
+    replyTo: data.email, // responder vai direto para o cliente
+    subject: `📨 Contato: ${data.name}${
+      data.orderNumber ? ` — Pedido ${data.orderNumber}` : ""
+    }`,
+    html: `<h2>Nova mensagem de contato</h2>
+<p><strong>Nome:</strong> ${data.name}</p>
+<p><strong>E-mail:</strong> ${data.email}</p>
+${data.orderNumber ? `<p><strong>Pedido:</strong> ${data.orderNumber}</p>` : ""}
+<p><strong>Mensagem:</strong></p>
+<p>${data.message.replace(/\n/g, "<br>")}</p>`,
+  });
+}
+
 /** Envia o e-mail com o link de redefinição de senha. */
 export async function sendPasswordReset(
   to: string,

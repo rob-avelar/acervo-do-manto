@@ -190,6 +190,21 @@ export const dict = {
       invalidToken: "Link inválido ou expirado. Peça um novo.",
       backToLogin: "Voltar ao login",
     },
+    contact: {
+      nav: "Suporte",
+      title: "Fale conosco",
+      intro:
+        "Tem alguma dúvida ou problema com seu pedido? Envie uma mensagem e responderemos o quanto antes.",
+      name: "Seu nome",
+      email: "Seu e-mail",
+      orderNumber: "Número do pedido (opcional)",
+      message: "Mensagem",
+      send: "Enviar mensagem",
+      sent: "Mensagem enviada! Em breve entraremos em contato por e-mail.",
+      fillAll: "Preencha nome, e-mail e mensagem.",
+      badEmail: "E-mail inválido.",
+      sendFail: "Não foi possível enviar agora. Tente novamente mais tarde.",
+    },
     footer: {
       about:
         "Camisas de futebol de clubes e seleções, retrôs e edições limitadas. Qualidade e entrega para todo o mundo.",
@@ -392,6 +407,21 @@ export const dict = {
       resetBtn: "Save new password",
       invalidToken: "Invalid or expired link. Please request a new one.",
       backToLogin: "Back to sign in",
+    },
+    contact: {
+      nav: "Support",
+      title: "Contact us",
+      intro:
+        "Have a question or an issue with your order? Send us a message and we'll reply as soon as possible.",
+      name: "Your name",
+      email: "Your email",
+      orderNumber: "Order number (optional)",
+      message: "Message",
+      send: "Send message",
+      sent: "Message sent! We'll get back to you by email soon.",
+      fillAll: "Please fill in name, email and message.",
+      badEmail: "Invalid email.",
+      sendFail: "Couldn't send right now. Please try again later.",
     },
     footer: {
       about:
@@ -596,6 +626,21 @@ export const dict = {
       invalidToken: "Enlace no válido o caducado. Solicita uno nuevo.",
       backToLogin: "Volver a iniciar sesión",
     },
+    contact: {
+      nav: "Soporte",
+      title: "Contáctanos",
+      intro:
+        "¿Tienes alguna duda o un problema con tu pedido? Envíanos un mensaje y te responderemos lo antes posible.",
+      name: "Tu nombre",
+      email: "Tu correo",
+      orderNumber: "Número de pedido (opcional)",
+      message: "Mensaje",
+      send: "Enviar mensaje",
+      sent: "¡Mensaje enviado! Te responderemos por correo pronto.",
+      fillAll: "Completa nombre, correo y mensaje.",
+      badEmail: "Correo no válido.",
+      sendFail: "No se pudo enviar ahora. Inténtalo más tarde.",
+    },
     footer: {
       about:
         "Camisetas de fútbol de clubes y selecciones, retro y ediciones limitadas. Calidad y envío a todo el mundo.",
@@ -798,6 +843,21 @@ export const dict = {
       resetBtn: "Nieuw wachtwoord opslaan",
       invalidToken: "Ongeldige of verlopen link. Vraag een nieuwe aan.",
       backToLogin: "Terug naar inloggen",
+    },
+    contact: {
+      nav: "Support",
+      title: "Neem contact op",
+      intro:
+        "Heb je een vraag of een probleem met je bestelling? Stuur ons een bericht en we reageren zo snel mogelijk.",
+      name: "Je naam",
+      email: "Je e-mail",
+      orderNumber: "Bestelnummer (optioneel)",
+      message: "Bericht",
+      send: "Bericht versturen",
+      sent: "Bericht verzonden! We nemen snel per e-mail contact met je op.",
+      fillAll: "Vul naam, e-mail en bericht in.",
+      badEmail: "Ongeldig e-mailadres.",
+      sendFail: "Kon nu niet verzenden. Probeer het later opnieuw.",
     },
     footer: {
       about:

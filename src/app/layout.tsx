@@ -161,6 +161,11 @@ export default function RootLayout({
                       {t.checkout.policyLink}
                     </Link>
                   </li>
+                  <li>
+                    <Link href="/contato" className="hover:text-white">
+                      {t.contact.nav}
+                    </Link>
+                  </li>
                 </ul>
               </div>
             </div>
