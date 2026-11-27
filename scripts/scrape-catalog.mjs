@@ -134,9 +134,12 @@ function classify(title) {
   // agasalho/jaqueta — mesmo que contenha palavras como "training suit" ou
   // "zipper". Evita classificar camisas como jaquetas (preço de conjunto).
   const isShirtLike = /\bshirt\b|\bjersey\b|short sleeve|pre[-\s]?match/.test(t);
-  const isTrainingSuit = !isShirtLike && /training suit|tracksuit/.test(t);
+  const isTrainingSuit =
+    !isShirtLike && /training suit|tracksuit|training kit/.test(t);
   const isHalfZip = !isShirtLike && /half[-\s]?zip/.test(t);
-  const isHooded = !isShirtLike && /hooded/.test(t);
+  const isHooded = !isShirtLike && /hooded|hoodie/.test(t);
+  // Conjunto leve camisa + shorts (manga curta) — preço próprio
+  const isShortKit = /short sleeve kit/.test(t);
   const isJacket = !isShirtLike && /\bjacket\b|windbreaker/.test(t);
   const isOuterwear =
     isTrainingSuit || isHalfZip || isHooded || isJacket || isPolo;
@@ -160,14 +163,12 @@ function classify(title) {
 
   // Preço de venda (R$) + custo do fornecedor (US$ x 5,80) por tipo.
   let priceCents, costCents;
-  if (isTrainingSuit) {
-    priceCents = 44990; costCents = 27840; // agasalho completo (kit $48)
-  } else if (isHalfZip) {
-    priceCents = 34990; costCents = 23200; // meio-zíper ($40)
-  } else if (isHooded) {
-    priceCents = 32990; costCents = 20300; // jaqueta com capuz ($35)
+  if (isShortKit) {
+    priceCents = 22990; costCents = 11600; // conjunto camisa + shorts (~€45)
+  } else if (isTrainingSuit || isHalfZip || isHooded) {
+    priceCents = 33290; costCents = 20880; // conjunto completo blusa+calça (~€65)
   } else if (isJacket) {
-    priceCents = 32990; costCents = 20880; // jaqueta / corta-vento ($36)
+    priceCents = 32990; costCents = 20880; // jaqueta / corta-vento (~€64)
   } else if (isPolo) {
     priceCents = 19990; costCents = 11600; // polo + calça
   } else if (isNBA) {
