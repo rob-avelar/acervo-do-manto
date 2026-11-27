@@ -174,7 +174,7 @@ function classify(title) {
   } else if (isNBA) {
     priceCents = 22990; costCents = 11600; // $20
   } else if (isRetro) {
-    priceCents = 21990; costCents = 10440; // $18
+    priceCents = 23990; costCents = 10440; // retrô (~€47)
   } else if (isPlayer) {
     priceCents = 21990; costCents = 9860; // $17
   } else if (isWomen) {
@@ -182,7 +182,7 @@ function classify(title) {
   } else if (isLongSleeve) {
     priceCents = 18990; costCents = 8120; // $14
   } else if (isKids) {
-    priceCents = 17990; costCents = 7540; // $13
+    priceCents = 16490; costCents = 7540; // infantil (~€32)
   } else {
     priceCents = 17990; costCents = 6960; // torcedor $12
   }
