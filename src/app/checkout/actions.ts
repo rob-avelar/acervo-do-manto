@@ -13,15 +13,60 @@ import {
   type Customization,
 } from "@/lib/customization";
 
-// Dados do cliente logado para pré-preencher o checkout (ou null).
-export async function getCheckoutPrefill(): Promise<{
+export type CheckoutPrefill = {
   name: string;
   email: string;
   phone: string;
-} | null> {
+  address: {
+    country: string;
+    cep: string;
+    street: string;
+    number: string;
+    complement: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+  } | null;
+};
+
+// Dados do cliente logado para pré-preencher o checkout (ou null).
+// Inclui o último endereço usado (vira o "endereço padrão", editável).
+export async function getCheckoutPrefill(): Promise<CheckoutPrefill | null> {
   const c = await getCurrentCustomer();
   if (!c) return null;
-  return { name: c.name ?? "", email: c.email ?? "", phone: c.phone ?? "" };
+
+  const addr = await prisma.address.findFirst({
+    where: { customerId: c.id },
+    orderBy: { createdAt: "desc" },
+    select: {
+      country: true,
+      cep: true,
+      street: true,
+      number: true,
+      complement: true,
+      neighborhood: true,
+      city: true,
+      state: true,
+    },
+  });
+
+  return {
+    name: c.name ?? "",
+    email: c.email ?? "",
+    phone: c.phone ?? "",
+    address: addr
+      ? {
+          country: addr.country ?? "",
+          cep: addr.cep ?? "",
+          street: addr.street ?? "",
+          number: addr.number ?? "",
+          complement: addr.complement ?? "",
+          neighborhood: addr.neighborhood ?? "",
+          city: addr.city ?? "",
+          state: addr.state ?? "",
+        }
+      : null,
+  };
 }
 
 export type CheckoutItem = {

@@ -57,7 +57,7 @@ export default function CheckoutPage() {
     setForm((f) => (f.country === def ? f : { ...f, country: def }));
   }, [currency, countryTouched]);
 
-  // Pré-preenche nome/e-mail/telefone se o cliente estiver logado (editável)
+  // Pré-preenche dados do cliente logado + último endereço (editável)
   useEffect(() => {
     getCheckoutPrefill().then((me) => {
       if (!me) return;
@@ -66,7 +66,21 @@ export default function CheckoutPage() {
         name: f.name || me.name,
         email: f.email || me.email,
         phone: f.phone || me.phone,
+        ...(me.address
+          ? {
+              country: me.address.country || f.country,
+              cep: f.cep || me.address.cep,
+              street: f.street || me.address.street,
+              number: f.number || me.address.number,
+              complement: f.complement || me.address.complement,
+              neighborhood: f.neighborhood || me.address.neighborhood,
+              city: f.city || me.address.city,
+              state: f.state || me.address.state,
+            }
+          : {}),
       }));
+      // Se temos um endereço salvo com país, fixa o país (não deixa a moeda sobrescrever)
+      if (me.address?.country) setCountryTouched(true);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
