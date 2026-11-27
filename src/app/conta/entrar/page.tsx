@@ -25,6 +25,9 @@ export default async function LoginPage() {
           email: a.email,
           password: a.password,
           passwordHint: a.passwordHint,
+          confirmPassword: a.confirmPassword,
+          showPassword: a.showPassword,
+          hidePassword: a.hidePassword,
           submit: a.loginBtn,
           altPrompt: a.noAccount,
           altLink: a.createOne,
@@ -34,6 +37,7 @@ export default async function LoginPage() {
             shortPassword: a.shortPassword,
             wrongLogin: a.wrongLogin,
             emailInUse: a.emailInUse,
+            passwordMismatch: a.passwordMismatch,
           },
         }}
       />

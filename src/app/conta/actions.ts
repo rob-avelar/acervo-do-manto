@@ -28,9 +28,12 @@ export async function signupAction(
     .trim()
     .toLowerCase();
   const password = String(formData.get("password") ?? "");
+  const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
   if (!name || !email || !password) return { error: "fillAll" };
   if (password.length < 6) return { error: "shortPassword" };
+  if (confirmPassword && password !== confirmPassword)
+    return { error: "passwordMismatch" };
 
   const existing = await prisma.customer.findUnique({ where: { email } });
   if (existing?.passwordHash) return { error: "emailInUse" };

@@ -24,6 +24,9 @@ export default async function SignupPage() {
           email: a.email,
           password: a.password,
           passwordHint: a.passwordHint,
+          confirmPassword: a.confirmPassword,
+          showPassword: a.showPassword,
+          hidePassword: a.hidePassword,
           submit: a.signupBtn,
           altPrompt: a.hasAccount,
           altLink: a.goLogin,
@@ -33,6 +36,7 @@ export default async function SignupPage() {
             shortPassword: a.shortPassword,
             wrongLogin: a.wrongLogin,
             emailInUse: a.emailInUse,
+            passwordMismatch: a.passwordMismatch,
           },
         }}
       />
