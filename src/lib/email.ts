@@ -34,6 +34,81 @@ function fromAddress() {
   return process.env.EMAIL_FROM || `Acervo do Manto <${user}>`;
 }
 
+// --- Template de marca (tabela + estilos inline p/ compatibilidade) ---
+const LOGO_URL = "https://acervodomanto.com/logo.png";
+const IG_URL = "https://instagram.com/acervodomanto_";
+const SITE_URL = "https://acervodomanto.com";
+function supportAddr() {
+  return process.env.SMTP_USER || "support@acervodomanto.com";
+}
+
+function emailShell(o: {
+  heading: string;
+  body: string;
+  preheader?: string;
+  button?: { label: string; url: string };
+}): string {
+  const year = new Date().getFullYear();
+  return `<!doctype html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0b0b0e;">
+${
+  o.preheader
+    ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#0b0b0e;">${o.preheader}</div>`
+    : ""
+}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0b0b0e;padding:24px 0;">
+  <tr><td align="center">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:92%;">
+      <tr><td align="center" style="padding:4px 0 18px;">
+        <a href="${SITE_URL}"><img src="${LOGO_URL}" alt="Acervo do Manto" width="92" height="92" style="display:block;border:0;width:92px;height:92px;"></a>
+      </td></tr>
+      <tr><td style="background:#141419;border:1px solid #26262e;border-radius:14px;padding:28px;">
+        <h1 style="margin:0 0 14px;font-family:Arial,Helvetica,sans-serif;font-size:21px;line-height:1.3;color:#d4af37;">${o.heading}</h1>
+        <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#e6e6e6;">${o.body}</div>
+        ${
+          o.button
+            ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0 2px;"><tr><td style="border-radius:8px;background:#d4af37;"><a href="${o.button.url}" style="display:inline-block;padding:12px 26px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#111111;text-decoration:none;border-radius:8px;">${o.button.label}</a></td></tr></table>`
+            : ""
+        }
+      </td></tr>
+      <tr><td align="center" style="padding:18px 10px 4px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#8a8a8a;">
+        <a href="${IG_URL}" style="color:#d4af37;text-decoration:none;">@acervodomanto_</a>
+        &nbsp;·&nbsp;
+        <a href="mailto:${supportAddr()}" style="color:#d4af37;text-decoration:none;">${supportAddr()}</a>
+        <br>© ${year} Acervo do Manto
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+}
+
+// Bloco de itens estilizado para os e-mails.
+function itemsTable(items: OrderEmailItem[]): string {
+  const rows = items
+    .map(
+      (i) =>
+        `<tr><td style="padding:9px 0;border-bottom:1px solid #26262e;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#e6e6e6;"><strong style="color:#ffffff;">${i.quantity}×</strong> ${i.name} <span style="color:#9a9a9a;">(${i.size})</span>${
+          i.customizationText
+            ? `<br><span style="color:#d4af37;font-size:13px;">✨ ${i.customizationText}</span>`
+            : ""
+        }</td></tr>`,
+    )
+    .join("");
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 2px;">${rows}</table>`;
+}
+
+function addressBlock(a: OrderEmailData["address"]): string {
+  return `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#c9c9c9;line-height:1.5;">${a.street}${
+    a.number ? `, ${a.number}` : ""
+  }${a.complement ? ` — ${a.complement}` : ""}<br>${
+    a.neighborhood ? `${a.neighborhood} · ` : ""
+  }${a.city}${a.state ? `/${a.state}` : ""} · ${a.cep} · ${a.country}</div>`;
+}
+
 type OrderEmailItem = {
   name: string;
   size: string;
@@ -61,25 +136,6 @@ type OrderEmailData = {
   };
 };
 
-function itemsHtml(items: OrderEmailItem[]) {
-  return items
-    .map(
-      (i) =>
-        `<li>${i.quantity}× ${i.name} (${i.size})${
-          i.customizationText ? ` — <em>${i.customizationText}</em>` : ""
-        }</li>`,
-    )
-    .join("");
-}
-
-function addressHtml(a: OrderEmailData["address"]) {
-  return `${a.street}${a.number ? `, ${a.number}` : ""}${
-    a.complement ? ` — ${a.complement}` : ""
-  }<br>${a.neighborhood ? `${a.neighborhood} · ` : ""}${a.city}${
-    a.state ? `/${a.state}` : ""
-  } · ${a.cep} · ${a.country}`;
-}
-
 /** Envia e-mail de confirmação ao cliente e aviso de novo pedido ao dono. */
 export async function sendOrderEmails(data: OrderEmailData) {
   if (!emailEnabled()) return;
@@ -88,23 +144,37 @@ export async function sendOrderEmails(data: OrderEmailData) {
   const isBR = data.address.country.toUpperCase() === "BR";
   const t = getTransporter();
 
+  const label = (pt: string, en: string) => (isBR ? pt : en);
+
   // Cliente
   const customerSubject = isBR
     ? `Pedido ${data.number} recebido — Acervo do Manto`
     : `Order ${data.number} received — Acervo do Manto`;
-  const customerBody = isBR
-    ? `<h2>Obrigado pelo seu pedido!</h2>
-<p>Recebemos seu pedido <strong>${data.number}</strong> e já estamos preparando.</p>
-<p><strong>Itens:</strong></p><ul>${itemsHtml(data.items)}</ul>
-<p><strong>Entrega:</strong><br>${addressHtml(data.address)}</p>
-<p>Em breve você recebe o código de rastreio. Qualquer dúvida, é só responder este e-mail.</p>
-<p>— Acervo do Manto</p>`
-    : `<h2>Thank you for your order!</h2>
-<p>We've received your order <strong>${data.number}</strong> and we're preparing it.</p>
-<p><strong>Items:</strong></p><ul>${itemsHtml(data.items)}</ul>
-<p><strong>Delivery:</strong><br>${addressHtml(data.address)}</p>
-<p>You'll receive a tracking code soon. Reply to this email if you have any questions.</p>
-<p>— Acervo do Manto</p>`;
+
+  const customerBody = emailShell({
+    heading: label("Obrigado pelo seu pedido! ⚽", "Thank you for your order! ⚽"),
+    preheader: label(
+      `Pedido ${data.number} recebido`,
+      `Order ${data.number} received`,
+    ),
+    body: `
+<p style="margin:0 0 8px;">${label(
+      `Recebemos seu pedido <strong style="color:#fff;">${data.number}</strong> e já estamos preparando com carinho.`,
+      `We've received your order <strong style="color:#fff;">${data.number}</strong> and we're preparing it with care.`,
+    )}</p>
+<p style="margin:18px 0 4px;color:#d4af37;font-weight:bold;">${label("Itens", "Items")}</p>
+${itemsTable(data.items)}
+<p style="margin:18px 0 4px;color:#d4af37;font-weight:bold;">${label("Entrega", "Delivery")}</p>
+${addressBlock(data.address)}
+<p style="margin:18px 0 0;color:#b5b5b5;font-size:14px;">${label(
+      "Em breve você recebe o código de rastreio. Qualquer dúvida, é só responder este e-mail.",
+      "You'll receive a tracking code soon. Just reply to this email if you have any questions.",
+    )}</p>`,
+    button: {
+      label: label("Acompanhar pedido", "Track order"),
+      url: `${SITE_URL}/pedido/${data.number}`,
+    },
+  });
 
   const sends: Promise<unknown>[] = [
     t.sendMail({
@@ -122,14 +192,23 @@ export async function sendOrderEmails(data: OrderEmailData) {
         from,
         to: owner,
         subject: `🛒 New order ${data.number} — ${data.customerName}`,
-        html: `<h2>New order: ${data.number}</h2>
-<p><strong>Customer:</strong> ${data.customerName} · ${data.customerEmail}</p>
-<p><strong>Delivery:</strong><br>${addressHtml(data.address)}</p>
-<p><strong>Items:</strong></p><ul>${itemsHtml(data.items)}</ul>
-<p>Subtotal: ${formatMoney(data.subtotalCents, "EUR")}<br>
+        html: emailShell({
+          heading: `🛒 New order ${data.number}`,
+          preheader: `${data.customerName} · ${formatMoney(data.totalCents, "EUR")}`,
+          body: `
+<p style="margin:0 0 4px;"><strong style="color:#fff;">Customer:</strong> ${data.customerName} · ${data.customerEmail}</p>
+<p style="margin:14px 0 4px;color:#d4af37;font-weight:bold;">Delivery</p>
+${addressBlock(data.address)}
+<p style="margin:14px 0 4px;color:#d4af37;font-weight:bold;">Items</p>
+${itemsTable(data.items)}
+<p style="margin:16px 0 0;font-size:15px;">Subtotal: ${formatMoney(data.subtotalCents, "EUR")}<br>
 Shipping: ${formatMoney(data.shippingCents, "EUR")}<br>
-<strong>Total: ${formatMoney(data.totalCents, "EUR")}</strong></p>
-<p>View in dashboard: https://acervodomanto.com/admin/pedidos</p>`,
+<strong style="color:#fff;">Total: ${formatMoney(data.totalCents, "EUR")}</strong></p>`,
+          button: {
+            label: "Open dashboard",
+            url: `${SITE_URL}/admin/pedidos`,
+          },
+        }),
       }),
     );
   }
@@ -163,66 +242,75 @@ function statusCopy(
   isBR: boolean,
   number: string,
   tracking?: string | null,
-): { subject: string; html: string } | null {
+): { subject: string; heading: string; body: string } | null {
+  const num = `<strong style="color:#fff;">${number}</strong>`;
   const track =
     tracking && tracking.trim()
       ? isBR
-        ? `<p><strong>Código de rastreio:</strong> ${tracking}</p>`
-        : `<p><strong>Tracking code:</strong> ${tracking}</p>`
+        ? `<p style="margin:14px 0 4px;color:#d4af37;font-weight:bold;">Código de rastreio</p><p style="margin:0;font-size:16px;color:#fff;letter-spacing:0.5px;">${tracking}</p>`
+        : `<p style="margin:14px 0 4px;color:#d4af37;font-weight:bold;">Tracking code</p><p style="margin:0;font-size:16px;color:#fff;letter-spacing:0.5px;">${tracking}</p>`
       : "";
-
-  const sign = isBR ? `<p>— Acervo do Manto</p>` : `<p>— Acervo do Manto</p>`;
 
   switch (status) {
     case "PAID":
       return isBR
         ? {
             subject: `Pagamento confirmado — Pedido ${number}`,
-            html: `<h2>Pagamento confirmado! ✅</h2><p>Recebemos o pagamento do seu pedido <strong>${number}</strong>. Já vamos preparar o envio.</p>${sign}`,
+            heading: "Pagamento confirmado! ✅",
+            body: `<p style="margin:0;">Recebemos o pagamento do seu pedido ${num}. Já vamos preparar o envio.</p>`,
           }
         : {
             subject: `Payment confirmed — Order ${number}`,
-            html: `<h2>Payment confirmed! ✅</h2><p>We've received payment for your order <strong>${number}</strong>. We'll start preparing your shipment.</p>${sign}`,
+            heading: "Payment confirmed! ✅",
+            body: `<p style="margin:0;">We've received payment for your order ${num}. We'll start preparing your shipment.</p>`,
           };
     case "PROCESSING":
       return isBR
         ? {
             subject: `Pedido em preparação — ${number}`,
-            html: `<h2>Seu pedido está sendo preparado 📦</h2><p>O pedido <strong>${number}</strong> entrou em separação. Em breve ele será enviado.</p>${sign}`,
+            heading: "Seu pedido está sendo preparado 📦",
+            body: `<p style="margin:0;">O pedido ${num} entrou em separação. Em breve ele será enviado.</p>`,
           }
         : {
             subject: `Order being prepared — ${number}`,
-            html: `<h2>Your order is being prepared 📦</h2><p>Order <strong>${number}</strong> is now being packed. It will be shipped soon.</p>${sign}`,
+            heading: "Your order is being prepared 📦",
+            body: `<p style="margin:0;">Order ${num} is now being packed. It will be shipped soon.</p>`,
           };
     case "SHIPPED":
       return isBR
         ? {
             subject: `Seu pedido foi enviado! — ${number}`,
-            html: `<h2>Seu pedido está a caminho! 🚚</h2><p>O pedido <strong>${number}</strong> foi enviado.</p>${track}<p>Fique de olho, logo chega aí!</p>${sign}`,
+            heading: "Seu pedido está a caminho! 🚚",
+            body: `<p style="margin:0;">O pedido ${num} foi enviado.</p>${track}<p style="margin:14px 0 0;color:#b5b5b5;">Fique de olho, logo chega aí!</p>`,
           }
         : {
             subject: `Your order has shipped! — ${number}`,
-            html: `<h2>Your order is on its way! 🚚</h2><p>Order <strong>${number}</strong> has been shipped.</p>${track}<p>Keep an eye out — it'll arrive soon!</p>${sign}`,
+            heading: "Your order is on its way! 🚚",
+            body: `<p style="margin:0;">Order ${num} has been shipped.</p>${track}<p style="margin:14px 0 0;color:#b5b5b5;">Keep an eye out — it'll arrive soon!</p>`,
           };
     case "DELIVERED":
       return isBR
         ? {
             subject: `Pedido entregue — ${number}`,
-            html: `<h2>Pedido entregue! 🎉</h2><p>O pedido <strong>${number}</strong> foi marcado como entregue. Esperamos que você curta sua nova camisa!</p><p>Qualquer coisa, é só responder este e-mail.</p>${sign}`,
+            heading: "Pedido entregue! 🎉",
+            body: `<p style="margin:0;">O pedido ${num} foi marcado como entregue. Esperamos que você curta sua nova camisa!</p>`,
           }
         : {
             subject: `Order delivered — ${number}`,
-            html: `<h2>Order delivered! 🎉</h2><p>Order <strong>${number}</strong> has been marked as delivered. We hope you love your new shirt!</p><p>Reply to this email if you need anything.</p>${sign}`,
+            heading: "Order delivered! 🎉",
+            body: `<p style="margin:0;">Order ${num} has been marked as delivered. We hope you love your new shirt!</p>`,
           };
     case "CANCELLED":
       return isBR
         ? {
             subject: `Pedido cancelado — ${number}`,
-            html: `<h2>Pedido cancelado</h2><p>O pedido <strong>${number}</strong> foi cancelado. Se tiver qualquer dúvida sobre reembolso, responda este e-mail.</p>${sign}`,
+            heading: "Pedido cancelado",
+            body: `<p style="margin:0;">O pedido ${num} foi cancelado. Se tiver qualquer dúvida sobre reembolso, responda este e-mail.</p>`,
           }
         : {
             subject: `Order cancelled — ${number}`,
-            html: `<h2>Order cancelled</h2><p>Order <strong>${number}</strong> has been cancelled. If you have any questions about a refund, just reply to this email.</p>${sign}`,
+            heading: "Order cancelled",
+            body: `<p style="margin:0;">Order ${num} has been cancelled. If you have any questions about a refund, just reply to this email.</p>`,
           };
     default:
       return null; // PENDING não notifica
@@ -248,13 +336,17 @@ export async function sendContactEmail(data: {
     subject: `📨 ${data.subject || "Contato"}: ${data.name}${
       data.orderNumber ? ` — Pedido ${data.orderNumber}` : ""
     }`,
-    html: `<h2>Nova mensagem de contato</h2>
-<p><strong>Nome:</strong> ${data.name}</p>
-<p><strong>E-mail:</strong> ${data.email}</p>
-${data.subject ? `<p><strong>Assunto:</strong> ${data.subject}</p>` : ""}
-${data.orderNumber ? `<p><strong>Pedido:</strong> ${data.orderNumber}</p>` : ""}
-<p><strong>Mensagem:</strong></p>
-<p>${data.message.replace(/\n/g, "<br>")}</p>`,
+    html: emailShell({
+      heading: "📨 Nova mensagem de contato",
+      preheader: `${data.name} — ${data.subject || "Contato"}`,
+      body: `
+<p style="margin:0 0 4px;"><strong style="color:#fff;">Nome:</strong> ${data.name}</p>
+<p style="margin:0 0 4px;"><strong style="color:#fff;">E-mail:</strong> <a href="mailto:${data.email}" style="color:#d4af37;">${data.email}</a></p>
+${data.subject ? `<p style="margin:0 0 4px;"><strong style="color:#fff;">Assunto:</strong> ${data.subject}</p>` : ""}
+${data.orderNumber ? `<p style="margin:0 0 4px;"><strong style="color:#fff;">Pedido:</strong> ${data.orderNumber}</p>` : ""}
+<p style="margin:16px 0 4px;color:#d4af37;font-weight:bold;">Mensagem</p>
+<p style="margin:0;color:#e6e6e6;">${data.message.replace(/\n/g, "<br>")}</p>`,
+    }),
   });
 }
 
@@ -269,19 +361,35 @@ export async function sendPasswordReset(
   const copy = {
     pt: {
       subject: "Redefinir sua senha — Acervo do Manto",
-      html: `<h2>Olá, ${name}!</h2><p>Recebemos um pedido para redefinir sua senha. Clique no botão abaixo (válido por 1 hora):</p><p><a href="${link}" style="display:inline-block;background:#d4af37;color:#111;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Redefinir senha</a></p><p>Se você não pediu isso, pode ignorar este e-mail.</p><p>— Acervo do Manto</p>`,
+      heading: `Olá, ${name}! 🔑`,
+      intro:
+        "Recebemos um pedido para redefinir sua senha. Clique no botão abaixo (válido por 1 hora):",
+      btn: "Redefinir senha",
+      foot: "Se você não pediu isso, pode ignorar este e-mail com segurança.",
     },
     en: {
       subject: "Reset your password — Acervo do Manto",
-      html: `<h2>Hi, ${name}!</h2><p>We received a request to reset your password. Click the button below (valid for 1 hour):</p><p><a href="${link}" style="display:inline-block;background:#d4af37;color:#111;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Reset password</a></p><p>If you didn't request this, you can ignore this email.</p><p>— Acervo do Manto</p>`,
+      heading: `Hi, ${name}! 🔑`,
+      intro:
+        "We received a request to reset your password. Click the button below (valid for 1 hour):",
+      btn: "Reset password",
+      foot: "If you didn't request this, you can safely ignore this email.",
     },
     es: {
       subject: "Restablecer tu contraseña — Acervo do Manto",
-      html: `<h2>¡Hola, ${name}!</h2><p>Recibimos una solicitud para restablecer tu contraseña. Haz clic en el botón (válido 1 hora):</p><p><a href="${link}" style="display:inline-block;background:#d4af37;color:#111;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Restablecer contraseña</a></p><p>Si no lo solicitaste, puedes ignorar este correo.</p><p>— Acervo do Manto</p>`,
+      heading: `¡Hola, ${name}! 🔑`,
+      intro:
+        "Recibimos una solicitud para restablecer tu contraseña. Haz clic en el botón (válido 1 hora):",
+      btn: "Restablecer contraseña",
+      foot: "Si no lo solicitaste, puedes ignorar este correo con seguridad.",
     },
     nl: {
       subject: "Reset je wachtwoord — Acervo do Manto",
-      html: `<h2>Hoi, ${name}!</h2><p>We hebben een verzoek ontvangen om je wachtwoord te resetten. Klik op de knop (1 uur geldig):</p><p><a href="${link}" style="display:inline-block;background:#d4af37;color:#111;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Wachtwoord resetten</a></p><p>Heb je dit niet aangevraagd? Negeer deze e-mail.</p><p>— Acervo do Manto</p>`,
+      heading: `Hoi, ${name}! 🔑`,
+      intro:
+        "We hebben een verzoek ontvangen om je wachtwoord te resetten. Klik op de knop (1 uur geldig):",
+      btn: "Wachtwoord resetten",
+      foot: "Heb je dit niet aangevraagd? Negeer deze e-mail dan gerust.",
     },
   }[lang];
 
@@ -289,7 +397,12 @@ export async function sendPasswordReset(
     from: fromAddress(),
     to,
     subject: copy.subject,
-    html: copy.html,
+    html: emailShell({
+      heading: copy.heading,
+      preheader: copy.subject,
+      body: `<p style="margin:0;">${copy.intro}</p><p style="margin:16px 0 0;color:#9a9a9a;font-size:13px;">${copy.foot}</p>`,
+      button: { label: copy.btn, url: link },
+    }),
   });
 }
 
@@ -305,6 +418,14 @@ export async function sendStatusEmail(data: StatusEmailData) {
     from,
     to: data.customerEmail,
     subject: copy.subject,
-    html: copy.html,
+    html: emailShell({
+      heading: copy.heading,
+      preheader: copy.subject,
+      body: copy.body,
+      button: {
+        label: isBR ? "Acompanhar pedido" : "Track order",
+        url: `${SITE_URL}/pedido/${data.number}`,
+      },
+    }),
   });
 }
